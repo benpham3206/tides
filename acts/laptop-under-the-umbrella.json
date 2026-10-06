@@ -25,14 +25,6 @@
     0.8
    ],
    "hidden": true
-  },
-  "laptop": {
-   "sprite": "laptop",
-   "at": [
-    0.72,
-    0.81
-   ],
-   "hidden": true
   }
  },
  "beats": [
@@ -61,13 +53,10 @@
    "for": 1.5,
    "clawd": {
     "to": [
-     0.63,
-     0.79
+     0.68,
+     0.8
     ],
     "pose": "walk"
-   },
-   "laptop": {
-    "show": true
    }
   },
   {
@@ -101,9 +90,6 @@
    "for": 2,
    "clawd": {
     "pose": "dig"
-   },
-   "laptop": {
-    "show": false
    },
    "blanket": {
     "show": false
