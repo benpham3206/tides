@@ -91,7 +91,7 @@ a:hover { text-decoration-color: var(--ink); }
 #words .recent { margin: 0 0 0.3em; font-size: 0.82em; font-style: italic; }
 .latest { list-style: none; padding: 0; margin: 0 0 1.4em; }
 .latest li + li { margin-top: 0.35em; }
-.latest .quiet { display: block; font-size: 0.82em; line-height: 1.4; }
+.tide-note { font-size: 0.82em; line-height: 1.4; }
 
 /* Journal and entries */
 .page { max-width: 38rem; margin: 0 auto; padding: clamp(2rem, 8vh, 5rem) 1.5rem 6rem; }
