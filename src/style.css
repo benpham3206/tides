@@ -166,7 +166,7 @@ article .seal { display: block; width: 3.4rem; margin: 3rem 0 0 auto; transform:
   max-width: calc(100% - 2rem); margin: 0;
   font: 400 0.65rem/1.5 var(--mono); color: var(--ink);
   background: var(--paper); padding: 0.25rem 0.5rem;
-  white-space: nowrap; overflow-x: auto;
+  white-space: pre; overflow-x: auto;
 }
 .game-live {
   position: absolute; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden;

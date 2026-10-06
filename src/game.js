@@ -27,7 +27,7 @@
   const refresh = () => {
     const inventory = parts.filter((p) => save.parts[p.id]).map((p) => `${p.name} ${save.parts[p.id]}`).join(', ') || 'empty';
     const collection = machines.filter((m) => save.built.includes(m.id)).map((m) => m.name).join(', ') || 'none';
-    hud.textContent = `${inventory} · ${collection} · ? ${boat?.art?.length ? boat.art.join(' ') : 'boat'}`;
+    hud.textContent = `${inventory} · ${collection}\n${boat?.art?.length ? boat.art.join('\n') : '? boat'}`;
   };
   const persist = () => { try { localStorage.setItem('tides.game.v1', JSON.stringify(save)); } catch {} refresh(); };
   refresh();
