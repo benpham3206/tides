@@ -145,6 +145,26 @@ const arrow = (side, to) => (to ? `<a href="${to.href}" data-arrow="${side}"><sv
 const turn = (older, newer, middle = '<span></span>') => `<nav class="turn">${arrow('left', older)}${middle}${arrow('right', newer)}</nav>`;
 const DAYS_PER_PAGE = 7;
 
+// Monterey's predicted high and low tides (NOAA station 9413450), a month ahead, so the beach's water follows the real tide.
+// The site rebuilds daily; if NOAA can't be reached, the beach falls back to a simple day/night tide.
+async function tides() {
+  const d = new Date(Date.now() - 864e5), day = d.toISOString().slice(0, 10).replaceAll('-', '');
+  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&station=9413450&datum=MLLW&interval=hilo&units=english&time_zone=gmt&format=json&application=tides&begin_date=${day}&range=768`;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+    const { predictions } = await res.json();
+    // NOAA's answer is outside data: keep only well-formed events.
+    const events = predictions.map((p) => ({ t: Date.parse(`${p.t.replace(' ', 'T')}Z`), v: Number(p.v), hi: p.type === 'H' }))
+      .filter((e) => Number.isFinite(e.t) && Number.isFinite(e.v));
+    if (events.length < 4) throw new Error('too few tides');
+    console.log(`tides: ${events.length} Monterey events`);
+    return events;
+  } catch (e) {
+    console.warn(`tides: none (${e.message}); using the day/night tide`);
+    return [];
+  }
+}
+
 function home(posts, beach) {
   const latest = posts.filter((p) => p.date === posts[0]?.date).sort((a, b) => a.tide.localeCompare(b.tide));
   const items = latest.map((p) => `<li><a href="blog/${p.slug}/">${esc(p.title)}</a><span class="quiet">${when(p)}</span></li>`);
@@ -212,6 +232,7 @@ ${items.join('\n')}
 const deny = denylist(), posts = load();
 check(posts, deny);
 const beach = world(deny);
+if (!process.argv.includes('--check')) beach.tides = await tides();
 console.log(`checked ${posts.length} entries, ${beach.acts.length} acts`);
 if (!process.argv.includes('--check')) {
   rmSync('dist', { recursive: true, force: true });

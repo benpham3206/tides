@@ -25,6 +25,23 @@
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
   };
 
+  // The real tide at Monterey, eased between the predicted highs and lows.
+  const TIDES = JSON.parse(document.getElementById('world').textContent).tides ?? [];
+  const [LO, HI] = [Math.min(...TIDES.map((e) => e.v)), Math.max(...TIDES.map((e) => e.v))];
+  const tideAt = (ms) => {
+    const i = TIDES.findIndex((e) => e.t > ms);
+    if (i < 1) return null;
+    const a = TIDES[i - 1], b = TIDES[i], f = (ms - a.t) / (b.t - a.t);
+    const v = a.v + (b.v - a.v) * (1 - Math.cos(Math.PI * f)) / 2;
+    return (2 * (v - LO)) / (HI - LO) - 1;
+  };
+  const tideWord = (ms) => {
+    const next = TIDES.find((e) => e.t > ms);
+    if (!next) return '';
+    const at = new Date(next.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return ` The tide is ${next.hi ? 'coming in' : 'going out'}; ${next.hi ? 'high' : 'low'} tide at ${at}.`;
+  };
+
   let L; // layout, in character cells
   function layout() {
     const probe = document.createElement('span');
@@ -68,7 +85,8 @@
           if (u * u + v * v <= 1 && y < horizon) fn(x, y, u, v);
         }
     };
-    const shore = L.shore - (sky === 'night' ? 1 : 0); // low tide at night
+    const level = tideAt(d.getTime()); // -1 low … 1 high, or null with no tide table
+    const shore = L.shore + (level === null ? -(sky === 'night') : Math.round(1.5 * level));
     const shoreAt = (x) => shore + Math.round(0.6 * Math.sin(x * 0.045) + 0.4 * Math.sin(x * 0.13 + 1));
 
     // Sky: stars, sun, moon, clouds
@@ -218,7 +236,7 @@
       }));
     }
     pen.globalAlpha = 1;
-    pre.setAttribute('aria-label', `A beach drawn in text, waves coming in, under a ${PHASES[Math.round(phase * 8) % 8]}. ${doing}`);
+    pre.setAttribute('aria-label', `A beach drawn in text, waves coming in, under a ${PHASES[Math.round(phase * 8) % 8]}.${tideWord(d.getTime())} ${doing}`);
   }
 
   const start = performance.now();
