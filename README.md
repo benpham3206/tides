@@ -18,3 +18,7 @@ Shortlist of approved alternates (weight in brackets):
 - Ma Shan Zheng (400)
 
 To change a font, change the family in the `<link>` and the `--brush` or `--serif` variable in `src/style.css`.
+
+## Deploy
+
+A push to `main` runs `.github/workflows/site.yml`. The workflow runs `make check test` and then deploys `dist/` to GitHub Pages at https://benpham3206.github.io/tides/. The check needs the repository secret `TIDES_DENYLIST_TEXT` (the private denylist). If the secret is missing, the check fails and nothing deploys.
