@@ -1,0 +1,51 @@
+{
+  "title": "builds an inclined plane",
+  "sprites": {
+    "plank": {
+      "color": "wood",
+      "poses": {
+        "rest": {"every": 1, "frames": [["==="]]}
+      }
+    },
+    "pebble": {
+      "color": "ink",
+      "poses": {
+        "rest": {"every": 1, "frames": [["(o)"]]}
+      }
+    },
+    "assembly": {
+      "color": "wood",
+      "poses": {
+        "base": {"every": 1, "frames": [[" ______"]]},
+        "half": {"every": 1, "frames": [["       /.", "     /  .", "   /    .", " /______|"]]},
+        "done": {"every": 1, "frames": [["       /|", "     /  |", "   /    |", " /______|"]]},
+        "use": {"every": 0.35, "frames": [["       /|", "     /  |", "   /    |", " /______|"]]}
+      }
+    },
+    "cargo": {
+      "color": "ink",
+      "poses": {
+        "rest": {"every": 1, "frames": [["(o)"]]}
+      }
+    }
+  },
+  "cast": {
+    "clawd": {"at": [0.64, 0.7]},
+    "machine": {"sprite": "assembly", "at": [0.64, 0.7], "pose": "base", "hidden": true},
+    "plank": {"sprite": "plank", "at": [0.12, 0.78], "pose": "rest"},
+    "pebble": {"sprite": "pebble", "at": [0.27, 0.78], "pose": "rest"},
+    "cargo": {"sprite": "cargo", "at": [0.53, 0.7], "pose": "rest", "hidden": true}
+  },
+  "beats": [
+    {"for": 0.4, "clawd": {"pose": "idle", "say": "let us build"}},
+    {"for": 0.7, "clawd": {"to": [0.12, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "carry"}, "plank": {"to": [0.52, 0.7]}},
+    {"for": 0.7, "clawd": {"to": [0.27, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "walk"}, "pebble": {"to": [0.57, 0.7]}},
+    {"for": 1, "clawd": {"pose": "type", "say": "fit the pieces"}, "machine": {"show": true, "pose": "base"}, "plank": {"show": false}, "pebble": {"show": false}},
+    {"for": 1, "clawd": {"pose": "type"}, "machine": {"pose": "half"}},
+    {"for": 1, "clawd": {"pose": "idle", "say": "ready"}, "machine": {"pose": "done"}},
+    {"for": 1.2, "clawd": {"pose": "type", "say": "roll it up"}, "machine": {"pose": "use"}, "cargo": {"show": true, "to": [0.74, 0.4], "hop": 2}},
+    {"for": 0.8, "clawd": {"pose": "wave", "say": "made it"}, "machine": {"pose": "done"}, "cargo": {"show": false}}
+  ]
+}
