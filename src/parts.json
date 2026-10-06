@@ -1,0 +1,10 @@
+[
+  { "id": "driftwood", "name": "driftwood", "color": "wood", "art": ["~=/"] },
+  { "id": "plank", "name": "plank", "color": "wood", "art": ["==="] },
+  { "id": "rope", "name": "rope", "color": "sand", "art": ["@~"] },
+  { "id": "shell", "name": "shell", "color": "moon", "art": ["/v", "\\_"] },
+  { "id": "pebble", "name": "pebble", "color": "ink", "art": ["(o)"] },
+  { "id": "kelp", "name": "kelp", "color": "land", "art": ["~Y", " J"] },
+  { "id": "cork", "name": "cork float", "color": "sun", "art": ["[o]"] },
+  { "id": "gear", "name": "gear", "color": "ink", "art": ["{+}"] }
+]
