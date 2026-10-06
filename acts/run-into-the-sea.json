@@ -1,7 +1,9 @@
 {
  "title": "runs into the sea",
  "when": [
-  "day"
+  "dawn",
+  "day",
+  "dusk"
  ],
  "cast": {
   "clawd": {
@@ -29,28 +31,46 @@
    }
   },
   {
-   "for": 2,
+   "for": 3,
    "clawd": {
     "to": [
-     0.56,
-     -0.25
+     0.57,
+     -1.25
     ],
     "pose": "swim"
    }
   },
   {
-   "for": 6,
+   "for": 12,
    "clawd": {
     "to": [
-     0.6,
-     -0.3
+     0.75,
+     -1.4
     ]
    }
   },
   {
-   "for": 1.2,
+   "for": 1.5,
    "clawd": {
     "say": "cold!"
+   }
+  },
+  {
+   "for": 12,
+   "clawd": {
+    "to": [
+     0.5,
+     -0.7
+    ]
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "to": [
+     0.55,
+     0.02
+    ]
    }
   },
   {

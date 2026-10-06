@@ -29,8 +29,8 @@
   "laptop": {
    "sprite": "laptop",
    "at": [
-    0.77,
-    0.83
+    0.72,
+    0.81
    ],
    "hidden": true
   }
@@ -61,7 +61,7 @@
    "for": 1.5,
    "clawd": {
     "to": [
-     0.69,
+     0.63,
      0.79
     ],
     "pose": "walk"

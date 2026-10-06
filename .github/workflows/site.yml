@@ -23,7 +23,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: make check test
+      - run: npm run check && npm test
         env:
           TIDES_DENYLIST_TEXT: ${{ secrets.TIDES_DENYLIST_TEXT }}
       - uses: actions/upload-pages-artifact@v3

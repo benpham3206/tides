@@ -2,3 +2,14 @@ node_modules/
 dist/
 .env
 *.local
+# Local agent scaffolding; kept on this machine, not published.
+.engineering-manifest
+AGENTS.md
+ARCHITECTURE.md
+GOAL.md
+STATUS.md
+SECURITY.md
+*_TASK.md
+Makefile
+scripts/
+runs/
