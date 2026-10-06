@@ -18,11 +18,11 @@
 
   const flip = (t, s) => Math.floor(t / s) % 2;
   const FIRE = [['  (  ', ' )\\( ', '(()()'], ['  )  ', ' (/) ', ')()()'], [' (   ', '  )\\ ', '()())'], ['   ) ', ' /( )', '(())(']];
+  const SEESAW = [['         ====', '    =====    ', '==== /_\\     '], ['             ', '=============', '     /_\\     '],
+                  ['====         ', '    =====    ', '     /_\\ ===='], ['             ', '=============', '     /_\\     ']];
+  const LOW = [2, 1, 0, 1]; // which of the see-saw's three rows its left end sits on, per frame; the right end mirrors it
   const MACHINES = [
-    { name: 'see-saw', w: 13, rows: (t, s) => s.using
-      ? [['         ====', '    =====    ', '==== /_\\     '], ['             ', '=============', '     /_\\     '],
-         ['====         ', '    =====    ', '     /_\\ ===='], ['             ', '=============', '     /_\\     ']][Math.floor(t / 0.5) % 4]
-      : ['         ====', '    =====    ', '==== /_\\     '] },
+    { name: 'see-saw', w: 13, rows: (t, s) => SEESAW[s.using ? Math.floor(t / 0.5) % 4 : s.seated ? 2 : 0] },
     { name: 'pinwheel', w: 5, rows: (t, s) => [
       ...(flip(t, s.using ? 0.15 : 0.45) ? [' \\ / ', '  o  ', ' / \\ '] : ['  |  ', '--o--', '  |  ']), '  |  ', '  |  ', ' _|_ '] },
     { name: 'kite', w: 3, rows: () => [' | ', '_|_'], sky: true },
@@ -188,6 +188,9 @@
       rows.forEach((row, j) => j >= rows.length - show && [...row].forEach((ch, i) => ch !== ' ' && put(c + i, r - rows.length + 1 + j, ch, cls)));
     };
     const sprites = [...scenery]; // drawn back to front with Clawd and the machines
+    // The see-saw needs two: a passerby wanders over, they ride, and it goes on its way before Clawd gets up.
+    const seesaw = st.kind === 'play' && MACHINES[st.i % MACHINES.length].name === 'see-saw' ? SLOTS[st.i % 4] : null;
+    const company = seesaw ? Math.min(T - st.t0, st.t1 - T) / 20 : 0; // 0..1 while it walks over or away, then more
 
     for (const b of onBeach(k)) {
       const today = b.i === k;
@@ -197,7 +200,7 @@
       sprites.push({ r: p.r, fn: () => {
         if (today && back && T >= back.t1 && stage < 1) art(c - 1, p.r, ['▬▬▬', '▬▬▬▬'], 'wood'); // the pile of materials
         if (stage <= 0) return;
-        art(c, p.r, b.m.rows(t, { using: using && stage >= 1, sky }), 'machine', stage);
+        art(c, p.r, b.m.rows(t, { using: using && stage >= 1 && (!seesaw || company >= 1), seated: using, sky }), 'machine', stage);
         if (b.m.lamp && stage >= 1 && sky === 'night' && flip(t, 1.2)) put(c + 2, p.r - 4, '*', 'lamp');
         if (b.m.sky && stage >= 1 && sky !== 'night') {
           const kx = c + 12 + Math.round(2 * Math.sin(t * 0.7)), ky = Math.max(2, p.r - 14) + Math.round(Math.sin(t * 1.1));
@@ -249,7 +252,14 @@
       const pose = moving ? (st.carry ? 'carry' : 'walk')
         : { sleep: 'sleep', sit: 'sit', dig: 'dig', build: 'dig', look: 'idle', play: 'idle' }[st.kind];
       const fade = st.kind === 'fade' ? (st.back ? f : 1 - f) : 1;
-      actor(SPRITES.clawd, pose, at.x, at.y, t, { fade, say: st.kind === 'look' && st.found && T - st.t0 < 3 ? '!' : undefined });
+      if (seesaw) {
+        const f = company >= 1 ? Math.floor(t / 0.5) % 4 : 2, col = 1 / (spot(1, seesaw.y).c - spot(0, seesaw.y).c);
+        const end = (side, row) => ({ x: seesaw.x + side * 4.5 * col, hop: 3 - row }); // sitting on that end of the plank
+        const mine = end(1, 2 - LOW[f]), theirs = end(-1, LOW[f]);
+        actor(SPRITES.clawd, 'sit', mine.x, seesaw.y, t, { hop: mine.hop - 1 }); // pixels sit on the plank's own row, text above it
+        if (company < 1) actor(SPRITES.human, 'walk', -0.1 + (theirs.x + 0.1) * company, seesaw.y, t);
+        else actor(SPRITES.human, LOW[f] === 0 ? 'cheer' : 'sit', theirs.x, seesaw.y, t, { hop: theirs.hop });
+      } else actor(SPRITES.clawd, pose, at.x, at.y, t, { fade, say: st.kind === 'look' && st.found && T - st.t0 < 3 ? '!' : undefined });
       if (st.kind === 'build' && flip(t, 0.3)) { const p = spot(at.x, at.y); put(p.c - 5, p.r - 1, '*', 'spark'); }
       if (st.kind === 'sleep') { // a small fire keeps it company through the night
         const p = spot(at.x + 0.09, at.y), n = Math.floor(t * 5);
@@ -269,7 +279,7 @@
       sleep: 'is asleep on the sand', sit: 'sits at the water’s edge, watching the sun',
       walk: st.carry ? 'carries an armful of driftwood' : 'wanders along the beach', dig: 'digs in the sand',
       look: 'looks at something it found', away: 'is away collecting materials', fade: 'walks along the water',
-      build: `is building a ${MACHINES[k % MACHINES.length].name}`, play: `plays with its ${MACHINES[(st.i ?? 0) % MACHINES.length].name}`,
+      build: `is building a ${MACHINES[k % MACHINES.length].name}`, play: company >= 1 ? 'rides the see-saw with someone passing by' : `plays with its ${MACHINES[(st.i ?? 0) % MACHINES.length].name}`,
     }[st.kind]}.`;
   }
 
