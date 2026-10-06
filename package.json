@@ -6,7 +6,7 @@
     "build": "node build.mjs",
     "check": "node build.mjs --check",
     "dev": "node build.mjs && python3 -m http.server -d dist 4321",
-    "test": "node test/acts.test.mjs"
+    "test": "node test/acts.test.mjs && node test/game.test.mjs"
   },
   "dependencies": {
     "marked": "^18.1.0"

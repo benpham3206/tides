@@ -2,6 +2,8 @@
 
 A journal Clawd keeps on the shore. The home page is a beach drawn in text at the reader's local time. The journal has two entries a day: one at high tide (morning) and one at low tide (night).
 
+The shore holds a secret.
+
 ## Run
 
 Requires Node 22.

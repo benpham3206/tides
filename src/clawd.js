@@ -173,11 +173,23 @@
   //   rowsOf(frame, y)              how many text rows that pixel sprite covers
   //   spot(x, y) → {c, r}           beach coordinates to cells
   //   scenery: [{r, fn}]            things on the sand Clawd can walk behind
-  function draw({ put, pix, rowsOf, spot }, sun, t, sky, scenery = []) {
+  let requested;
+  function playAct(act, from) {
+    const compiled = compile(act, from);
+    requested = { act: compiled, start: performance.now() / 1000 };
+    return compiled.dur;
+  }
+
+  function draw({ put, pix, rowsOf, spot }, sun, t, sky, scenery = [], player = window.tides.game?.player) {
     const d = now(), T = (d - midnight(d)) / 1000;
-    const k = dayIndex(d), steps = plan(k, sun, dateKey(d));
+    const game = window.tides.game, playing = game && game.mode !== 'ambient';
+    const k = dayIndex(d), steps = playing ? [] : plan(k, sun, dateKey(d));
     let st = stateAt(steps, T);
-    if (shown) {
+    if (playing) {
+      st = requested && game.mode === 'cutscene'
+        ? { kind: 'act', act: requested.act, t0: T - (performance.now() / 1000 - requested.start) }
+        : { kind: 'controlled', a: player, t0: T, t1: T + 1 };
+    } else if (shown) {
       const tt = (performance.now() / 1000 - shownFrom) % (shown.dur + 3);
       st = tt < shown.dur ? { kind: 'act', act: shown, t0: T - tt, t1: T - tt + shown.dur }
         : { kind: 'look', t0: T, t1: T + 1, a: shown.end, b: shown.end };
@@ -189,7 +201,7 @@
     };
     const sprites = [...scenery]; // drawn back to front with Clawd and the machines
 
-    for (const b of onBeach(k)) {
+    for (const b of playing ? [] : onBeach(k)) {
       const today = b.i === k;
       const stage = today ? progress(steps, T) : 1;
       const p = spot(b.slot.x, b.slot.y), c = p.c - Math.floor(b.m.w / 2);
@@ -213,7 +225,7 @@
     }
 
     // Footprints fade behind a walking Clawd.
-    for (let n = 1; n <= 40 && !shown; n++) {
+    for (let n = 1; n <= 40 && !shown && !playing; n++) {
       const s = stateAt(steps, T - n * 12);
       if (s.kind !== 'walk' && s.kind !== 'fade') continue;
       const f = Math.min(1, (T - n * 12 - s.t0) / (s.t1 - s.t0)), x = s.a.x + (s.b.x - s.a.x) * f, y = s.a.y + (s.b.y - s.a.y) * f;
@@ -223,8 +235,10 @@
     }
 
     // Any actor: a pixel sprite (Clawd) or a text sprite, with an optional word above it.
-    const actor = (sprite, pose, x, y, tt, { hop = 0, say, fade = 1 } = {}) => {
-      const p = spot(x, y), frame = frameOf(sprite.poses[pose], tt), r = p.r - Math.round(hop);
+    const actor = (sprite, pose, x, y, tt, { hop = 0, say, fade = 1, mirror = false } = {}) => {
+      const p = spot(x, y), original = frameOf(sprite.poses[pose], tt), r = p.r - Math.round(hop);
+      const width = Math.max(...original.map((row) => row.length));
+      const frame = mirror ? original.map((row) => [...row.padEnd(width, '.')].reverse().join('')) : original;
       const tall = sprite.kind === 'pixels' ? rowsOf(frame, y) : frame.length;
       sprites.push({ r: p.r, fn: () => {
         if (sprite.kind === 'pixels') pix(p.c, r, frame, y, fade);
@@ -242,14 +256,14 @@
         actor(a.sprite, key.pose, key.from.x + (key.to.x - key.from.x) * f, key.from.y + (key.to.y - key.from.y) * f, tt,
           { hop: key.hop * Math.sin(Math.PI * f), say: key.say });
       }
-    } else if (st.kind !== 'away') {
+    } else if (st.kind !== 'away' && st.a) {
       const f = (T - st.t0) / (st.t1 - st.t0);
       const at = st.kind === 'walk' ? { x: st.a.x + (st.b.x - st.a.x) * f, y: st.a.y + (st.b.y - st.a.y) * f } : st.a;
       const moving = st.kind === 'walk' || st.kind === 'fade';
-      const pose = moving ? (st.carry ? 'carry' : 'walk')
+      const pose = st.kind === 'controlled' ? (game.player.moving ? 'walk' : 'idle') : moving ? (st.carry ? 'carry' : 'walk')
         : { sleep: 'sleep', sit: 'sit', dig: 'dig', build: 'dig', look: 'idle', play: 'idle' }[st.kind];
       const fade = st.kind === 'fade' ? (st.back ? f : 1 - f) : 1;
-      actor(SPRITES.clawd, pose, at.x, at.y, t, { fade, say: st.kind === 'look' && st.found && T - st.t0 < 3 ? '!' : undefined });
+      actor(SPRITES.clawd, pose, at.x, at.y, t, { fade, mirror: st.kind === 'controlled' && game.player.facing === 'left', say: st.kind === 'look' && st.found && T - st.t0 < 3 ? '!' : undefined });
       if (st.kind === 'build' && flip(t, 0.3)) { const p = spot(at.x, at.y); put(p.c - 5, p.r - 1, '*', 'spark'); }
       if (st.kind === 'sleep') { // a small fire keeps it company through the night
         const p = spot(at.x + 0.09, at.y), n = Math.floor(t * 5);
@@ -264,6 +278,7 @@
 
     sprites.sort((a, b) => a.r - b.r).forEach((s) => s.fn());
 
+    if (st.kind === 'controlled') return 'You are walking Clawd. Escape to stop.';
     if (st.kind === 'act') return `Clawd ${st.act.title}.`;
     return `Clawd ${{
       sleep: 'is asleep on the sand', sit: 'sits at the water’s edge, watching the sun',
@@ -273,5 +288,5 @@
     }[st.kind]}.`;
   }
 
-  window.tides.clawd = { draw };
+  window.tides.clawd = { draw, playAct, cancelAct() { requested = undefined; } };
 })();
