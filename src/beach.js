@@ -10,7 +10,6 @@
   const INK = { '#': '--clawd', o: '--eye', k: '--ink', d: '--bamboo', s: '--sun', b: '--wash', w: '--paper' };
   const words = document.getElementById('words'); // the sand stays clear behind this text
   const { now, sunTimes, skyAt, moonPhase, clawd } = window.tides;
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const PERIOD = 8; // seconds for a breaker to roll in
   const PHASES = ['new moon', 'waxing crescent', 'first quarter', 'waxing gibbous',
     'full moon', 'waning gibbous', 'last quarter', 'waning crescent'];
@@ -226,7 +225,6 @@
   const clock = () => (performance.now() - start) / 1000 + 4;
   layout();
   new ResizeObserver(() => { layout(); draw(clock()); }).observe(pre);
-  if (still) setInterval(() => draw(4), 30_000); // no waves rolling, but Clawd still keeps its day
-  else setInterval(() => document.hidden || draw(clock()), 125);
+  setInterval(() => document.hidden || draw(clock()), 125); // the waves roll for everyone, Reduce Motion or not, on purpose
   draw(clock());
 })();
