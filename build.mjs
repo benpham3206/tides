@@ -200,7 +200,7 @@ function journal(posts) {
       `<span class="quiet">Page ${n} of ${pages}</span>`) : '';
     return { path: `dist/${at(n)}index.html`, html: page({
       root, title: n === 1 ? 'Journal · Tides' : `Journal, page ${n} · Tides`, description: 'Clawd’s journal, newest first.',
-      body: `<div class="page">${header(root)}<main>${sections.join('\n') || '<p class="quiet">No entries yet. The first one comes with the next tide.</p>'}${nav}</main></div>`,
+      body: `<div class="page">${header(root)}<main>${n === 1 ? `<search class="find"><input type="search" id="find" placeholder="Search the journal" aria-label="Search the journal" data-index="${root}search.json" data-root="${root}"><ul id="found" aria-live="polite"></ul></search>` : ''}${sections.join('\n') || '<p class="quiet">No entries yet. The first one comes with the next tide.</p>'}${nav}</main></div>`,
     }) };
   });
 }
@@ -242,6 +242,8 @@ if (!process.argv.includes('--check')) {
   for (const { path, html } of journal(posts)) write(path, html);
   posts.forEach((p, i) => write(`dist/blog/${p.slug}/index.html`, entry(p, posts[i - 1], posts[i + 1])));
   write('dist/feed.xml', feed(posts));
+  // The journal's search box loads this: every entry's title, date, and words, newest first.
+  write('dist/search.json', JSON.stringify(posts.map((p) => ({ title: p.title, slug: p.slug, when: `${when(p)}, ${day(p.date, { day: 'numeric', month: 'long', year: 'numeric' })}`, text: p.body }))));
   write('dist/seal.svg', seal('#f1ece2').replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"'));
   console.log(`built dist/ (${posts.length} entries)`);
 }

@@ -60,6 +60,26 @@
     sessionStorage.removeItem('turn');
     if (side && e.viewTransition) e.viewTransition.types.add(side);
   });
+  // Journal search: every word typed must appear in the entry; the matches replace the week list.
+  addEventListener('DOMContentLoaded', () => {
+    const box = document.getElementById('find'), found = document.getElementById('found');
+    if (!box) return;
+    let index;
+    box.addEventListener('input', async () => {
+      index ??= await fetch(box.dataset.index).then((r) => r.json());
+      const words = box.value.toLowerCase().split(/\s+/).filter(Boolean);
+      const hits = words.length ? index.filter((p) => words.every((w) => `${p.title} ${p.text}`.toLowerCase().includes(w))) : [];
+      document.body.classList.toggle('finding', words.length > 0);
+      found.replaceChildren(...hits.map((p) => {
+        const li = document.createElement('li'), a = document.createElement('a'), when = document.createElement('span');
+        a.href = `${box.dataset.root}blog/${p.slug}/`; a.textContent = p.title;
+        when.className = 'quiet'; when.textContent = p.when;
+        li.append(a, when);
+        return li;
+      }));
+      if (words.length && !hits.length) found.textContent = 'Nothing on the sand matches that.';
+    });
+  });
   addEventListener('keydown', (e) => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.target.closest?.('input, textarea, [contenteditable]')) return;
     const side = { ArrowLeft: 'left', ArrowRight: 'right' }[e.key];

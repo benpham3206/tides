@@ -151,3 +151,11 @@ article .seal { display: block; width: 3.4rem; margin: 3rem 0 0 auto; transform:
   .turn a { transition: none; }
   .home-link:hover span, .home-link:focus-visible span { animation: none; }
 }
+
+.find { display: block; margin-bottom: 3rem; }
+.find input { width: 100%; font: inherit; color: inherit; background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); border-radius: 0; padding: 0.4rem 0; outline: none; }
+.find input:focus-visible { border-bottom-color: var(--ink); }
+.find input::placeholder { color: inherit; opacity: 0.45; font-style: italic; }
+#found { list-style: none; padding: 0; margin: 1.2rem 0 0; }
+#found li { display: flex; flex-direction: column; padding: 0.35rem 0; }
+.finding main > .day, .finding main > .turn { display: none; }
