@@ -24,7 +24,7 @@ Add its matching cutscene before expecting E to build the machine. Set `boat.art
 
 ## Add a cutscene
 
-Create `cutscenes/build-<machineId>.json` using the act format in [ACTS.md](ACTS.md). Use built-in sprites from `src/sprites.json` or act-local text sprites. Give the act a total duration of 6–12 seconds. The build runs `checkAct` from `lib/acts.mjs` and the same private denylist check as ambient acts. Cutscenes never enter the ambient day pool.
+Create `cutscenes/build-<machineId>.json` using the act format validated by [lib/acts.mjs](lib/acts.mjs). Use built-in sprites from `src/sprites.json` or act-local text sprites. Give the act a total duration of 6–12 seconds. The build runs `checkAct` from `lib/acts.mjs` and the same private denylist check as ambient acts. Cutscenes never enter the ambient day pool.
 
 ## Save and recovery
 
@@ -40,4 +40,4 @@ From the repository root, run the same command used by CI.
 npm run check && npm test
 ```
 
-The check requires the denylist described in [README.md](README.md). `test/game.test.mjs` drives keyboard events and the frame clock in a Node browser model. It covers entry and exit, movement, both scene edges, pickups, build affordability and cancellation, reloads, bad storage, and cutscene validation. It writes `tides-game-test-evidence.json` in the operating system's temporary directory with check names and source hashes. The test uses game data fixtures until the art files arrive.
+The check requires the denylist described in [README.md](README.md). `test/game.test.mjs` drives keyboard events and the frame clock in a Node browser model using the real parts, recipes, Monterey scene, sprites, and cutscene renderer. It covers entry and exit, movement, both scene edges, pickups, build affordability and cancellation, reloads, bad storage, and all six cutscenes. It writes `runs/game-test-evidence.json` with check names, source hashes, and the measured time to collect at least six parts and build two machines. `test/art.test.mjs` also checks the art and scene frames across desktop and phone layouts.

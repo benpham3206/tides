@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import vm from 'node:vm';
 import { checkAct } from '../lib/acts.mjs';
@@ -9,29 +8,21 @@ import { checkAct } from '../lib/acts.mjs';
 // Failures to exercise before implementation: accidental entry while typing, stuck keys, hidden-tab jumps,
 // missing scenes, slide input, repeated pickups, unaffordable builds, absent acts, early spending, canceled
 // builds, duplicate builds, unsafe saves, storage exceptions, nondeterministic or insufficient placement.
-const parts = ['rope', 'wood', 'stone', 'wheel', 'axle', 'cloth', 'metal', 'shell'].map((id) => ({ id, name: id, color: 'wood', art: ['o'] }));
-const machines = [
-  { id: 'lever', recipe: { wood: 1, stone: 1 } },
-  { id: 'wheel-and-axle', recipe: { wheel: 1, axle: 1, wood: 1 } },
-  { id: 'pulley', recipe: { rope: 2, wheel: 1 } },
-  { id: 'inclined-plane', recipe: { wood: 2, stone: 1 } },
-  { id: 'wedge', recipe: { metal: 1, wood: 1 } },
-  { id: 'screw', recipe: { metal: 2, shell: 1 } },
-].map((m) => ({ ...m, name: m.id, art: ['=o='] }));
-const cutscenes = machines.map((m) => ({ id: `build-${m.id}`, title: `builds a ${m.name}`, beats: [{ for: 3, clawd: { pose: 'dig' } }, { for: 5, clawd: { pose: 'wave' } }] }));
-const fixture = { game: { parts, machines, boat: { art: ['?'] } }, cutscenes };
-const sprites = JSON.parse(readFileSync('src/sprites.json', 'utf8'));
-for (const act of cutscenes) {
-  const { id, ...data } = act;
-  assert.deepEqual(checkAct(id, data, sprites), [], id);
-}
-const actualActs = existsSync('cutscenes') ? readdirSync('cutscenes').filter((f) => f.endsWith('.json')) : [];
-for (const file of actualActs) assert.deepEqual(checkAct(file.slice(0, -5), JSON.parse(readFileSync(`cutscenes/${file}`, 'utf8')), sprites), [], file);
+const json = (file) => JSON.parse(readFileSync(file, 'utf8'));
+const parts = json('src/parts.json');
+const { machines, boat } = json('src/machines.json');
+const sprites = json('src/sprites.json');
+const actualActs = readdirSync('cutscenes').filter((f) => f.endsWith('.json')).sort();
+const cutscenes = actualActs.map((file) => ({ id: file.slice(0, -5), ...json(`cutscenes/${file}`) }));
+const worldData = { game: { parts, machines, boat }, cutscenes, sprites, acts: [] };
+for (const { id, ...act } of cutscenes) assert.deepEqual(checkAct(id, act, sprites), [], id);
+const duration = (act) => act.beats.reduce((n, beat) => n + beat.for, 0);
+let atomic;
 
 const source = readFileSync('src/game.js', 'utf8');
 const checks = [];
 function check(name, fn) { fn(); checks.push(name); }
-function browser({ saved, world = fixture, missingScene = false, brokenStorage = false, day = 6 } = {}) {
+function browser({ saved, world = worldData, missingScene = false, brokenStorage = false, day = 6 } = {}) {
   let time = 0, frame = 0, stored = saved, canceled = 0;
   const acts = [], nodes = [], events = new Map();
   function node(tagName = 'DIV') {
@@ -48,11 +39,17 @@ function browser({ saved, world = fixture, missingScene = false, brokenStorage =
   const data = node('SCRIPT'); data.textContent = JSON.stringify(world);
   document.getElementById = (id) => id === 'world' ? data : nodes.find((n) => n.id === id);
   const window = node('WINDOW');
-  window.tides = { now: () => new Date(2026, 9, day, 12), scenes: { home: {}, ...(missingScene ? {} : { monterey: {} }) },
-    clawd: { playAct(act, from) { acts.push({ act, from: { ...from } }); return act.beats.reduce((n, b) => n + b.for, 0); }, cancelAct() { canceled++; } } };
+  window.tides = { now: () => new Date(2026, 9, day, 12), skyOf: () => 'day',
+    scenes: { home: {}, ...(missingScene ? {} : { monterey: {} }) } };
   const storage = { getItem() { if (brokenStorage) throw Error('blocked'); return stored ?? null; },
     setItem(key, value) { assert.equal(key, 'tides.game.v1'); if (brokenStorage) throw Error('full'); stored = value; } };
-  vm.runInNewContext(source, { window, document, localStorage: storage, performance: { now: () => time * 1000 }, Date, Math, JSON, console });
+  const context = vm.createContext({ window, document, localStorage: storage,
+    performance: { now: () => time * 1000 }, location: { search: '' }, URLSearchParams, Date, Math, JSON, console });
+  vm.runInContext(readFileSync('src/clawd.js', 'utf8'), context);
+  const { playAct, cancelAct } = window.tides.clawd;
+  window.tides.clawd.playAct = (act, from) => { acts.push({ act, from: { ...from } }); return playAct(act, from); };
+  window.tides.clawd.cancelAct = () => { canceled++; cancelAct(); };
+  vm.runInContext(source, context);
   const game = window.tides.game;
   const emit = (surface, type, options = {}) => {
     const e = { key: '', target: node(), preventDefault() { this.prevented = true; }, ...options };
@@ -61,7 +58,13 @@ function browser({ saved, world = fixture, missingScene = false, brokenStorage =
   };
   const key = (value, options) => emit('WINDOW', 'keydown', { key: value, ...options });
   const up = (value) => emit('WINDOW', 'keyup', { key: value });
-  const tick = (seconds = 0.125) => { time += seconds; frame += seconds; game.update(frame); };
+  const tick = (seconds = 0.125) => {
+    time += seconds; frame += seconds; game.update(frame);
+    if (game.mode === 'cutscene') window.tides.clawd.draw({
+      put() {}, pix(c, r, art) { assert.ok(art.some((row) => row.includes('#')), 'real Clawd frame'); },
+      rowsOf: () => 3, spot: (x, y) => ({ c: Math.round(x * 100), r: Math.round(y * 30) }),
+    }, { rise: 6, set: 18 }, frame, 'day');
+  };
   const advance = (seconds) => { for (let n = 0; n < Math.ceil(seconds / 0.125); n++) tick(); };
   const start = () => { key('d'); up('d'); tick(); };
   const walkTo = (x, y) => {
@@ -169,21 +172,25 @@ check('walking, rendering, pickup once, floating text, save and two builds under
   };
   collect(b.game.items.find((i) => i.scene === 'home'));
   b.key('d'); while (b.game.mode === 'play') b.tick(); b.up('d'); b.advance(0.625);
-  for (const part of ['wood', 'stone', 'wheel', 'axle']) {
-    while ((b.game.save.parts[part] ?? 0) < (part === 'wood' ? 2 : 1)) collect(b.game.items.find((i) => i.scene === 'monterey' && i.part.id === part && !i.taken));
+  for (const part of ['driftwood', 'pebble', 'gear', 'kelp']) {
+    while ((b.game.save.parts[part] ?? 0) < (part === 'driftwood' ? 2 : 1)) collect(b.game.items.find((i) => i.scene === 'monterey' && i.part.id === part && !i.taken));
   }
   while (picked < 6) collect(b.game.items.find((i) => i.scene === 'monterey' && !i.taken));
   const before = plain(b.game.save.parts); b.key('e');
   assert.equal(b.game.mode, 'cutscene'); assert.equal(b.acts[0].act.id, 'build-lever');
   assert.deepEqual(plain(b.game.save.parts), before);
-  b.key('w'); b.key('e'); const p = plain(b.game.player); b.advance(7.875);
+  b.key('w'); b.key('e'); const p = plain(b.game.player); b.advance(Math.floor(duration(b.acts[0].act) / 0.125) * 0.125);
   assert.deepEqual(plain(b.game.player), p); assert.equal(b.game.save.built.length, 0);
   b.advance(0.125); assert.equal(b.game.mode, 'play'); assert.deepEqual(plain(b.game.save.built), ['lever']);
-  assert.equal(b.game.save.parts.wood, before.wood - 1); assert.equal(b.game.save.parts.stone, before.stone - 1);
+  assert.equal(b.game.save.parts.driftwood, before.driftwood - 1); assert.equal(b.game.save.parts.pebble, before.pebble - 1);
   b.tick(); assert.equal(b.game.player.y, p.y);
-  b.key('e'); assert.equal(b.acts[1].act.id, 'build-wheel-and-axle'); b.advance(8);
+  b.key('e'); assert.equal(b.acts[1].act.id, 'build-wheel-and-axle'); b.advance(duration(b.acts[1].act));
   assert.deepEqual(plain(b.game.save.built), ['lever', 'wheel-and-axle']);
+  const collected = b.game.items.filter((item) => item.taken).length;
+  assert.ok(collected >= 6);
   assert.ok(b.time < 180, `six pickups and two machines in ${b.time}s`);
+  atomic = { date: '2026-10-06', collected, built: plain(b.game.save.built), seconds: b.time,
+    cutscenes: b.acts.map(({ act }) => ({ id: act.id, seconds: duration(act) })) };
   assert.match(b.nodes.find((n) => n.id === 'game-hud').textContent, /lever/);
   assert.match(b.nodes.find((n) => n.id === 'game-hud').textContent, /\?/);
   const reloaded = browser({ saved: b.saved }); assert.deepEqual(plain(reloaded.game.save), plain(b.game.save));
@@ -191,13 +198,29 @@ check('walking, rendering, pickup once, floating text, save and two builds under
 
 check('affordability, unavailable acts, repeats and cancellation never spend', () => {
   const empty = browser(); empty.start(); empty.key('e'); assert.equal(empty.game.mode, 'play'); assert.equal(empty.acts.length, 0);
-  const saved = JSON.stringify({ parts: { wood: 3, stone: 3 }, built: [] });
+  const saved = JSON.stringify({ parts: { driftwood: 3, pebble: 3 }, built: [] });
   const b = browser({ saved }); b.start(); b.key('e', { repeat: true }); assert.equal(b.acts.length, 0);
   b.key('e'); b.advance(2); b.key('Escape'); b.advance(20);
-  assert.equal(b.game.mode, 'ambient'); assert.deepEqual(plain(b.game.save), { parts: { wood: 3, stone: 3 }, built: [] }); assert.ok(b.canceled > 0);
-  const missing = browser({ saved, world: { ...fixture, cutscenes: [] } }); missing.start(); missing.key('e');
-  assert.equal(missing.game.mode, 'play'); assert.deepEqual(plain(missing.game.save), { parts: { wood: 3, stone: 3 }, built: [] });
-  const built = browser({ saved: JSON.stringify({ parts: { wood: 1, stone: 1 }, built: ['lever'] }) }); built.start(); built.key('e'); assert.equal(built.acts.length, 0);
+  assert.equal(b.game.mode, 'ambient'); assert.deepEqual(plain(b.game.save), { parts: { driftwood: 3, pebble: 3 }, built: [] }); assert.ok(b.canceled > 0);
+  const missing = browser({ saved, world: { ...worldData, cutscenes: [] } }); missing.start(); missing.key('e');
+  assert.equal(missing.game.mode, 'play'); assert.deepEqual(plain(missing.game.save), { parts: { driftwood: 3, pebble: 3 }, built: [] });
+  const built = browser({ saved: JSON.stringify({ parts: { driftwood: 1, pebble: 1 }, built: ['lever'] }) }); built.start(); built.key('e'); assert.equal(built.acts.length, 0);
+});
+
+check('all six real cutscenes render and spend their recipes once', () => {
+  const b = browser({ saved: JSON.stringify({ parts: Object.fromEntries(parts.map((p) => [p.id, 99])), built: [] }) });
+  b.start();
+  for (const machine of machines) {
+    const before = plain(b.game.save.parts);
+    b.key('e');
+    assert.equal(b.game.mode, 'cutscene');
+    assert.equal(b.acts.at(-1).act.id, `build-${machine.id}`);
+    b.advance(duration(b.acts.at(-1).act));
+    assert.equal(b.game.mode, 'play');
+    for (const [id, n] of Object.entries(machine.recipe)) assert.equal(b.game.save.parts[id], before[id] - n);
+  }
+  assert.deepEqual(plain(b.game.save.built), ['lever', 'wheel-and-axle', 'pulley', 'inclined-plane', 'wedge', 'screw']);
+  b.key('e'); assert.equal(b.acts.length, 6);
 });
 
 check('external storage validates ids, types, counts and prototype keys', () => {
@@ -205,8 +228,8 @@ check('external storage validates ids, types, counts and prototype keys', () => 
     const b = browser({ saved }); assert.deepEqual(plain(b.game.save), { parts: {}, built: [] });
     assert.equal(Object.getPrototypeOf(b.game.save.parts), null);
   }
-  const b = browser({ saved: '{"parts":{"rope":2,"wood":-1,"stone":1.5,"wheel":100,"axle":"1","cloth":99,"metal":1e99,"unknown":2,"__proto__":3,"constructor":4},"built":["lever","unknown","lever","__proto__",3,"screw"]}' });
-  assert.deepEqual(plain(b.game.save), { parts: { rope: 2, cloth: 99 }, built: ['lever', 'screw'] });
+  const b = browser({ saved: '{"parts":{"rope":2,"driftwood":-1,"pebble":1.5,"gear":100,"shell":"1","cork":99,"plank":1e99,"unknown":2,"__proto__":3,"constructor":4},"built":["lever","unknown","lever","__proto__",3,"screw"]}' });
+  assert.deepEqual(plain(b.game.save), { parts: { rope: 2, cork: 99 }, built: ['lever', 'screw'] });
   assert.equal(Object.getPrototypeOf(b.game.save.parts), null);
   const full = browser({ saved: '{"parts":{"rope":99},"built":[]}' }); full.start();
   const item = full.game.items.find((i) => i.scene === 'home' && i.part.id === 'rope');
@@ -222,7 +245,7 @@ check('real renderer draws one Clawd across desktop and phone slides', () => {
     const pre = { append() {}, after() {}, setAttribute() {}, getBoundingClientRect() { return { width, height: 900, left: 0, top: 0 }; } };
     const words = { getBoundingClientRect() { return width > 500 ? { left: 86, right: 566, top: 570, bottom: 830 } : { left: 20, right: 370, top: 500, bottom: 830 }; } };
     const document = { hidden: false, documentElement: {},
-      getElementById(id) { return { beach: pre, words, world: { textContent: JSON.stringify({ ...fixture, sprites, acts: [] }) } }[id]; },
+      getElementById(id) { return { beach: pre, words, world: { textContent: JSON.stringify({ ...worldData, sprites, acts: [] }) } }[id]; },
       createElement(tag) { return tag === 'canvas' ? { getContext() { return pen; }, setAttribute() {} } : { getBoundingClientRect() { return { width: 320 }; }, remove() {} }; } };
     const game = { mode: 'play', scene: 'home', player: { x: 1, y: 0.7, facing: 'right', moving: false }, update() {}, scenery() { return []; } };
     const tides = { game, now: () => new Date(2026, 9, 6, 12), skyOf: () => 'day', skyAt: () => 'day', moonPhase: () => 0.5,
@@ -231,8 +254,7 @@ check('real renderer draws one Clawd across desktop and phone slides', () => {
       performance: { now: () => 1000 }, devicePixelRatio: 1,
       getComputedStyle() { return { lineHeight: '18.75', getPropertyValue(k) { return k; } }; },
       ResizeObserver: class { observe() {} }, setInterval(fn) { draw = fn; } });
-    for (const file of ['src/clawd.js', 'src/beach.js']) vm.runInContext(readFileSync(file, 'utf8'), context, { filename: file });
-    tides.scenes.monterey = tides.scenes.home;
+    for (const file of ['src/clawd.js', 'src/monterey.js', 'src/beach.js']) vm.runInContext(readFileSync(file, 'utf8'), context, { filename: file });
     draw(); assert.equal(pixels, 256, 'controlled Clawd is rendered');
     for (const direction of [1, -1]) {
       game.mode = 'slide'; game.scene = direction > 0 ? 'home' : 'monterey';
@@ -242,7 +264,8 @@ check('real renderer draws one Clawd across desktop and phone slides', () => {
   }
 });
 
-const evidence = join(tmpdir(), 'tides-game-test-evidence.json');
-writeFileSync(evidence, JSON.stringify({ command: 'node test/game.test.mjs', checks, actualCutscenes: actualActs,
-  sources: Object.fromEntries(['src/game.js', 'src/beach.js', 'src/clawd.js', 'test/game.test.mjs'].map((f) => [f, createHash('sha256').update(readFileSync(f)).digest('hex')])) }, null, 2) + '\n');
+mkdirSync('runs', { recursive: true });
+const evidence = join('runs', 'game-test-evidence.json');
+writeFileSync(evidence, JSON.stringify({ command: 'node test/game.test.mjs', checks, atomic, actualCutscenes: actualActs,
+  sources: Object.fromEntries(['src/game.js', 'src/beach.js', 'src/clawd.js', 'src/monterey.js', 'src/sprites.json', 'src/parts.json', 'src/machines.json', 'test/game.test.mjs', ...actualActs.map((f) => `cutscenes/${f}`)].map((f) => [f, createHash('sha256').update(readFileSync(f)).digest('hex')])) }, null, 2) + '\n');
 console.log(`game: ${checks.length} browser-flow checks passed; evidence ${evidence}`);

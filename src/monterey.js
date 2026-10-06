@@ -53,7 +53,7 @@
         items.push({ r: p.r, fn: () => art(put, p.c - Math.floor(width / 2), p.r, rows, color) });
       };
       place(0.13, 0.18, small ? [' ._.', '/%_#\\'] : ['  __,', ' / . \\', '/_%__#\\'], 'c-ink');
-      place(0.43, 0.18, small ? ['(~~o_)'] : [' .____.', '(~ o ~_)', ' `----\''], 'c-sea');
+      place(0.43, 0.18, small ? ['(~~o_)'] : [' .____.', '(~ . ~_)', ' `----\''], 'c-sea');
       place(0.78, 0.72, small ? [' /#\\', '/_._\\'] : ['   _--.', ' _/ . #\\', '/_%____#\\'], 'c-ink');
       // Keep the bluff beside the playable sand, above the foreground railing.
       const right = Math.min(cols - 1, ground.x1 + 5), bottom = Math.min(rail - 1, ground.y1);
