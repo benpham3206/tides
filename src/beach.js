@@ -7,7 +7,7 @@
   canvas.setAttribute('aria-hidden', 'true');
   pre.after(canvas);
   const pen = canvas.getContext('2d');
-  const INK = { '#': '--clawd', o: '--eye', k: '--ink', d: '--bamboo', s: '--sun', b: '--wash', w: '--paper' };
+  const INK = { '#': '--clawd', o: '--eye', k: '--ink', d: '--bamboo', s: '--sun', b: '--wash', w: '--paper', g: '--moon' };
   const words = document.getElementById('words'); // the sand stays clear behind this text
   const { now, sunTimes, skyAt, moonPhase, clawd } = window.tides;
   const PERIOD = 8; // seconds for a breaker to roll in
