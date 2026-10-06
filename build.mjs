@@ -214,7 +214,7 @@ function entry(p, newer, older) {
 ${marked.parse(p.body)}
 ${seal('var(--paper)')}
 </article></main>
-${turn(older && { href: `../${older.slug}/`, label: `Before: ${esc(older.title)}` }, newer && { href: `../${newer.slug}/`, label: `After: ${esc(newer.title)}` })}</div>`,
+${turn(older && { href: `../${older.slug}/`, label: `Previous: ${esc(older.title)}` }, newer && { href: `../${newer.slug}/`, label: `Next: ${esc(newer.title)}` })}</div>`,
   });
 }
 
