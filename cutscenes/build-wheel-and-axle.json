@@ -1,0 +1,53 @@
+{
+  "title": "builds a wheel and axle",
+  "sprites": {
+    "gear": {
+      "color": "ink",
+      "poses": {
+        "rest": {"every": 1, "frames": [["{+}"]]}
+      }
+    },
+    "driftwood": {
+      "color": "wood",
+      "poses": {
+        "rest": {"every": 1, "frames": [["~=/"]]}
+      }
+    },
+    "kelp": {
+      "color": "land",
+      "poses": {
+        "rest": {"every": 1, "frames": [["~Y", " J"]]}
+      }
+    },
+    "assembly": {
+      "color": "wood",
+      "poses": {
+        "base": {"every": 1, "frames": [["   ==="]]},
+        "half": {"every": 1, "frames": [[" ..-..", ".  +  .=.=", " '---'"]]},
+        "done": {"every": 1, "frames": [[" .---.", "(  +  )===", " '---'"]]},
+        "use": {"every": 0.35, "frames": [[" .---.", "(  x  )===", " '---'"], [" .---.", "(  +  )===", " '---'"]]}
+      }
+    }
+  },
+  "cast": {
+    "clawd": {"at": [0.64, 0.7]},
+    "machine": {"sprite": "assembly", "at": [0.64, 0.7], "pose": "base", "hidden": true},
+    "gear": {"sprite": "gear", "at": [0.12, 0.78], "pose": "rest"},
+    "driftwood": {"sprite": "driftwood", "at": [0.27, 0.78], "pose": "rest"},
+    "kelp": {"sprite": "kelp", "at": [0.42, 0.78], "pose": "rest"}
+  },
+  "beats": [
+    {"for": 0.4, "clawd": {"pose": "idle", "say": "let us build"}},
+    {"for": 0.7, "clawd": {"to": [0.12, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "walk"}, "gear": {"to": [0.52, 0.7]}},
+    {"for": 0.7, "clawd": {"to": [0.27, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "carry"}, "driftwood": {"to": [0.57, 0.7]}},
+    {"for": 0.7, "clawd": {"to": [0.42, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "walk"}, "kelp": {"to": [0.62, 0.7]}},
+    {"for": 1, "clawd": {"pose": "type", "say": "fit the pieces"}, "machine": {"show": true, "pose": "base"}, "gear": {"show": false}, "driftwood": {"show": false}, "kelp": {"show": false}},
+    {"for": 1, "clawd": {"pose": "type"}, "machine": {"pose": "half"}},
+    {"for": 1, "clawd": {"pose": "idle", "say": "ready"}, "machine": {"pose": "done"}},
+    {"for": 1.2, "clawd": {"pose": "type", "say": "give it a turn"}, "machine": {"pose": "use"}},
+    {"for": 0.8, "clawd": {"pose": "wave", "say": "made it"}, "machine": {"pose": "done"}}
+  ]
+}

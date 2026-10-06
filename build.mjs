@@ -72,8 +72,49 @@ function world(deny) {
     problems.push(...privateNames(deny, text).map((term) => `acts/${file}: names something private ("${term}")`));
     return { id, ...act };
   }).filter(Boolean);
+  const cutscenes = (existsSync('cutscenes') ? readdirSync('cutscenes') : []).filter((f) => f.endsWith('.json')).sort().map((file) => {
+    const id = file.replace(/\.json$/, ''), text = readFileSync(`cutscenes/${file}`, 'utf8');
+    let act;
+    try { act = JSON.parse(text); } catch (e) { problems.push(`cutscenes/${file}: not JSON (${e.message})`); return null; }
+    const errors = checkAct(id, act, sprites);
+    problems.push(...errors.map((e) => `cutscenes/${file}: ${e}`));
+    if (!errors.length) {
+      const duration = act.beats.reduce((n, beat) => n + beat.for, 0);
+      if (duration < 6 || duration > 12) problems.push(`cutscenes/${file}: must last 6-12 seconds`);
+    }
+    problems.push(...privateNames(deny, text).map((term) => `cutscenes/${file}: names something private ("${term}")`));
+    return { id, ...act };
+  }).filter(Boolean);
+  const data = (file, fallback) => {
+    if (!existsSync(file)) return fallback;
+    const text = readFileSync(file, 'utf8');
+    problems.push(...privateNames(deny, text).map((term) => `${file}: names something private ("${term}")`));
+    try { return JSON.parse(text); } catch (e) { problems.push(`${file}: not JSON (${e.message})`); return fallback; }
+  };
+  const parts = data('src/parts.json', []), machines = data('src/machines.json', { machines: [], boat: { art: [] } });
+  const safeId = (id) => typeof id === 'string' && /^[a-z][a-z0-9-]{0,23}$/.test(id) && !['__proto__', 'constructor', 'prototype'].includes(id);
+  const art = (rows, width, height) => Array.isArray(rows) && rows.length > 0 && rows.length <= height && rows.every((r) => typeof r === 'string' && r.length <= width && /^[\x20-\x7E─-▟]*$/.test(r));
+  const name = (v) => typeof v === 'string' && /^[A-Za-z0-9 ,.'’!?:;()-]{1,60}$/.test(v);
+  const known = new Set();
+  if (!Array.isArray(parts) || parts.length > 8) problems.push('src/parts.json: at most 8 parts');
+  else for (const p of parts) {
+    if (!p || !safeId(p.id) || known.has(p.id) || !name(p.name) || !['ink', 'clawd', 'sea', 'sun', 'sand', 'wood', 'land', 'lamp', 'moon'].includes(p.color) || !art(p.art, 3, 2))
+      problems.push('src/parts.json: each part needs a unique safe id, name, color, and art at most 3 by 2');
+    else known.add(p.id);
+  }
+  if (!machines || !Array.isArray(machines.machines) || machines.machines.length > 6) problems.push('src/machines.json: at most 6 machines');
+  else {
+    const ids = new Set();
+    for (const m of machines.machines) {
+      const recipe = m?.recipe, entries = recipe && typeof recipe === 'object' && !Array.isArray(recipe) ? Object.entries(recipe) : [];
+      if (!m || !safeId(m.id) || ids.has(m.id) || !name(m.name) || !art(m.art, 12, 5) || entries.length < 2 || entries.length > 3 || entries.some(([id, n]) => !known.has(id) || !Number.isInteger(n) || n < 1 || n > 99))
+        problems.push('src/machines.json: each machine needs a unique safe id, name, art at most 12 by 5, and a recipe of 2-3 known parts');
+      else ids.add(m.id);
+    }
+    if (machines.boat && !art(machines.boat.art, 12, 5) && machines.boat.art?.length !== 0) problems.push('src/machines.json: boat art at most 12 by 5');
+  }
   if (problems.length) throw new Error(`the beach failed the check:\n  ${problems.join('\n  ')}`);
-  return { sprites, acts };
+  return { sprites, acts, game: { parts, machines: machines.machines, boat: machines.boat ?? { art: [] } }, cutscenes };
 }
 
 // ---------- pages ----------
@@ -184,7 +225,7 @@ ${notes.length ? `<p class="tide-note quiet">${notes.join('<br>')}</p>` : ''}
 <a href="blog/">Read the journal</a>
 </div>
 </main>`,
-    script: '<script src="clawd.js"></script>\n<script src="beach.js"></script>',
+    script: '<script src="clawd.js"></script>\n' + (existsSync('src/monterey.js') ? '<script src="monterey.js"></script>\n' : '') + '<script src="game.js"></script>\n<script src="beach.js"></script>',
   });
 }
 

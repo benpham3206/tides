@@ -42,6 +42,39 @@
     return ` The tide is ${next.hi ? 'coming in' : 'going out'}; ${next.hi ? 'high' : 'low'} tide at ${at}.`;
   };
 
+  window.tides.scenes = window.tides.scenes || {};
+  window.tides.scenes.home = {
+    name: 'Home',
+    far(put, { cols, horizon, hash, sky, t }) {
+      const ix = cols * 0.7, iw = Math.max(12, cols * 0.13);
+      const island = (x) => { const u = (x - ix) / iw; return Math.round(Math.max(5.4 * Math.exp(-(((u + 0.3) / 0.42) ** 2)), 3.4 * Math.exp(-(((u - 0.55) / 0.32) ** 2)))); };
+      for (let x = 0; x < cols; x++) {
+        const top = island(x);
+        for (let j = 1; j <= top; j++) put(x, horizon - j, j === top ? (hash(x, 3) < 0.5 ? '.' : ',') : '%&#'[Math.floor(hash(x, j) * 3)], j === top ? 'land top' : 'land');
+        if (x < cols * 0.16) {
+          const town = Math.floor(hash(Math.floor(x / 3), 9) * 3);
+          for (let j = 1; j <= town; j++) put(x, horizon - j, j === town ? '▄' : '█', 'town');
+        }
+        if (x >= cols * 0.16 && x < ix - iw * 0.75) put(x, horizon, '=', 'town');
+      }
+      const towerX = Math.round(ix - iw * 0.3), towerTop = horizon - island(towerX) - 4;
+      ['|', '[#]', '|', '|'].forEach((s, j) => [...s].forEach((c, k) => put(towerX - (s.length > 1) + k, towerTop + j, c, 'land')));
+      if (sky === 'night' && Math.floor(t / 1.5) % 2) put(towerX, towerTop + 1, '*', 'lamp');
+    },
+    water() {},
+    near(put, { cols, ground, rail }) {
+      for (let x = 0; x < cols; x++) {
+        put(x, rail, x % 14 === 6 ? '╦' : '═', 'rail');
+        put(x, rail + 1, x % 14 === 6 ? '║' : ' ', 'rail');
+      }
+      const fence = (x0, r, n) => ({ r, fn: () => { for (let i = 0; i < n; i++) { put(x0 + i, r - 1, '|', 'bamboo'); put(x0 + i, r, '|', 'bamboo'); } } });
+      return [
+        fence(ground.x0 + Math.round((ground.x1 - ground.x0) * 0.08), ground.y1 - 1, Math.min(18, Math.round(cols * 0.12))),
+        fence(ground.x0 + Math.round((ground.x1 - ground.x0) * 0.62), ground.y0 + 3, Math.min(14, Math.round(cols * 0.1))),
+      ];
+    },
+  };
+
   let L; // layout, in character cells
   function layout() {
     const probe = document.createElement('span');
@@ -68,7 +101,7 @@
     L = { cw, ch, dpr, cols, rows, horizon, shore, rail, clear, ground, aspect: cw / ch };
   }
 
-  function draw(t) {
+  function frame(t, sceneId) {
     const { cols, rows, horizon, rail, clear, ground, aspect } = L;
     const d = now(), sky = skyAt(d), sun = sunTimes(d), phase = moonPhase(d);
     const ch = Array.from({ length: rows }, () => Array(cols).fill(' '));
@@ -127,21 +160,9 @@
       });
     }
 
-    // Far shore: the town on the left, the long bridge, the island with its tower.
-    const ix = cols * 0.7, iw = Math.max(12, cols * 0.13);
-    const island = (x) => { const u = (x - ix) / iw; return Math.round(Math.max(5.4 * Math.exp(-(((u + 0.3) / 0.42) ** 2)), 3.4 * Math.exp(-(((u - 0.55) / 0.32) ** 2)))); };
-    for (let x = 0; x < cols; x++) {
-      const top = island(x);
-      for (let j = 1; j <= top; j++) put(x, horizon - j, j === top ? (hash(x, 3) < 0.5 ? '.' : ',') : '%&#'[Math.floor(hash(x, j) * 3)], j === top ? 'land top' : 'land');
-      if (x < cols * 0.16) {
-        const town = Math.floor(hash(Math.floor(x / 3), 9) * 3);
-        for (let j = 1; j <= town; j++) put(x, horizon - j, j === town ? '▄' : '█', 'town');
-      }
-      if (x >= cols * 0.16 && x < ix - iw * 0.75) put(x, horizon, '=', 'town');
-    }
-    const towerX = Math.round(ix - iw * 0.3), towerTop = horizon - island(towerX) - 4;
-    ['|', '[#]', '|', '|'].forEach((s, j) => [...s].forEach((c, k) => put(towerX - (s.length > 1) + k, towerTop + j, c, 'land')));
-    if (sky === 'night' && Math.floor(t / 1.5) % 2) put(towerX, towerTop + 1, '*', 'lamp');
+    const sceneContext = { sceneId, cols, rows, horizon, t, sky, hash, sunX, ground, rail, shoreAt };
+    const scene = window.tides.scenes[sceneId] ?? window.tides.scenes.home;
+    scene.far(put, sceneContext);
 
     // Sea: a calm swell, the sun's road on the water, then the surf.
     for (let x = 0; x < cols; x++) {
@@ -193,29 +214,53 @@
         if (h < 0.035) put(x, y, '.', 'sand');
         else if (h < 0.045) put(x, y, ',', 'sand');
       }
-      put(x, rail, x % 14 === 6 ? '╦' : '═', 'rail');
-      put(x, rail + 1, x % 14 === 6 ? '║' : ' ', 'rail');
     }
 
-    // Bamboo sand fences
-    const fence = (x0, r, n) => ({ r, fn: () => { for (let i = 0; i < n; i++) { put(x0 + i, r - 1, '|', 'bamboo'); put(x0 + i, r, '|', 'bamboo'); } } });
-    const fences = [
-      fence(ground.x0 + Math.round((ground.x1 - ground.x0) * 0.08), ground.y1 - 1, Math.min(18, Math.round(cols * 0.12))),
-      fence(ground.x0 + Math.round((ground.x1 - ground.x0) * 0.62), ground.y0 + 3, Math.min(14, Math.round(cols * 0.1))),
-    ];
-
     const spot = (x, y) => ({ c: Math.round(ground.x0 + x * (ground.x1 - ground.x0)), r: Math.round(ground.y0 + y * (ground.y1 - ground.y0)) });
+    sceneContext.spot = spot;
+    scene.water?.(put, sceneContext);
+    const fences = scene.near(put, sceneContext) ?? [];
     const scale = (y) => 1.2 + 1.3 * Math.min(1, Math.max(0, y)); // CSS pixels per art pixel: smaller further off
     const pixels = [];
     const pix = (c, r, frame, y, fade) => pixels.push({ c, r, frame, unit: Math.max(1, Math.round(scale(y) * L.dpr)), fade });
     const rowsOf = (frame, y) => Math.ceil(frame.length * scale(y) / L.ch);
-    const doing = clawd.draw({ put, pix, rowsOf, spot }, sun, t, sky, fences);
+    sceneContext.rowsOf = rowsOf;
+    fences.push(...(window.tides.game?.scenery(put, sceneContext) ?? []));
+    const doing = clawd.draw({ put, pix, rowsOf, spot }, sun, t, sky, fences, window.tides.game?.mode === 'slide'
+      ? (sceneId === window.tides.game.slide.from ? window.tides.game.player : null) : undefined);
 
+    return { ch, cl, pixels, doing, phase, d };
+  }
+
+  function draw(t) {
+    const game = window.tides.game;
+    game?.update(t);
+    const active = game && game.mode !== 'ambient';
+    let { ch, cl, pixels, doing, phase, d } = frame(t, active ? game.scene : 'home');
+    if (game?.mode === 'slide') {
+      const { from, to, direction, start } = game.slide;
+      const f = Math.min(1, Math.max(0, (t - start) / 0.6));
+      const eased = f * f * (3 - 2 * f);
+      const left = { ch, cl, pixels }, right = frame(t, to);
+      const shift = -direction * Math.round(L.cols * eased);
+      ch = Array.from({ length: L.rows }, () => Array(L.cols).fill(' '));
+      cl = Array.from({ length: L.rows }, () => Array(L.cols).fill(''));
+      pixels = [];
+      for (const [part, offset] of [[left, shift], [right, shift + direction * L.cols]]) {
+        for (let y = 0; y < L.rows; y++) for (let x = 0; x < L.cols; x++) {
+          const c = x + offset;
+          if (c < 0 || c >= L.cols || (y >= L.clear.y0 && y < L.clear.y1 && c >= L.clear.x0 && c < L.clear.x1)) continue;
+          ch[y][c] = part.ch[y][x]; cl[y][c] = part.cl[y][x];
+        }
+        pixels.push(...part.pixels.map((p) => ({ ...p, c: p.c + offset })));
+      }
+    }
+    const { cols } = L;
     pre.innerHTML = ch.map((row, y) => {
       let out = '', run = '', k = cl[y][0];
       for (let x = 0; x <= cols; x++) {
         if (x === cols || cl[y][x] !== k) {
-          out += k ? `<span class="${k}">${run}</span>` : run;
+          out += k ? `<span class="${String(k).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])}">${run}</span>` : run;
           run = ''; k = cl[y][x];
         }
         if (x < cols) run += { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[ch[y][x]] ?? ch[y][x];
@@ -236,6 +281,7 @@
       }));
     }
     pen.globalAlpha = 1;
+    if (active) pen.clearRect(L.clear.x0 * L.cw * L.dpr, L.clear.y0 * L.ch * L.dpr, (L.clear.x1 - L.clear.x0) * L.cw * L.dpr, (L.clear.y1 - L.clear.y0) * L.ch * L.dpr);
     pre.setAttribute('aria-label', `A beach drawn in text, waves coming in, under a ${PHASES[Math.round(phase * 8) % 8]}.${tideWord(d.getTime())} ${doing}`);
   }
 

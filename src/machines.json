@@ -1,0 +1,11 @@
+{
+  "machines": [
+    { "id": "lever", "name": "lever", "recipe": { "driftwood": 1, "pebble": 1 }, "art": ["_________", "    /\\", "___/__\\___"] },
+    { "id": "wheel-and-axle", "name": "wheel and axle", "recipe": { "gear": 1, "driftwood": 1, "kelp": 1 }, "art": [" .---.", "(  +  )===", " '---'"] },
+    { "id": "pulley", "name": "pulley", "recipe": { "gear": 1, "rope": 1, "cork": 1 }, "art": ["  ___", " / O \\", " |   |", " |  [o]", " J"] },
+    { "id": "inclined-plane", "name": "inclined plane", "recipe": { "plank": 1, "pebble": 1 }, "art": ["       /|", "     /  |", "   /    |", " /______|"] },
+    { "id": "wedge", "name": "wedge", "recipe": { "plank": 1, "shell": 1 }, "art": ["  /|", " / |", "/__|"] },
+    { "id": "screw", "name": "screw", "recipe": { "driftwood": 1, "shell": 1 }, "art": ["  _____", "   |/|", "   / |", "   |/|", "    v"] }
+  ],
+  "boat": { "art": ["     |", "     |?\\", "     |__\\", " \\_______/", "  ~~~~~~~"] }
+}

@@ -1,0 +1,44 @@
+{
+  "title": "builds a wedge",
+  "sprites": {
+    "plank": {
+      "color": "wood",
+      "poses": {
+        "rest": {"every": 1, "frames": [["==="]]}
+      }
+    },
+    "shell": {
+      "color": "moon",
+      "poses": {
+        "rest": {"every": 1, "frames": [["/v", "\\_"]]}
+      }
+    },
+    "assembly": {
+      "color": "wood",
+      "poses": {
+        "base": {"every": 1, "frames": [["  /\\"]]},
+        "half": {"every": 1, "frames": [["  .|", " / |", "/__|"]]},
+        "done": {"every": 1, "frames": [["  /|", " / |", "/__|"]]},
+        "use": {"every": 0.35, "frames": [["   /|", "  / |", "( /_| )"], ["   /|", "  / |", "( /_|  )"]]}
+      }
+    }
+  },
+  "cast": {
+    "clawd": {"at": [0.64, 0.7]},
+    "machine": {"sprite": "assembly", "at": [0.64, 0.7], "pose": "base", "hidden": true},
+    "plank": {"sprite": "plank", "at": [0.12, 0.78], "pose": "rest"},
+    "shell": {"sprite": "shell", "at": [0.27, 0.78], "pose": "rest"}
+  },
+  "beats": [
+    {"for": 0.4, "clawd": {"pose": "idle", "say": "let us build"}},
+    {"for": 0.7, "clawd": {"to": [0.12, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "carry"}, "plank": {"to": [0.52, 0.7]}},
+    {"for": 0.7, "clawd": {"to": [0.27, 0.78], "pose": "walk"}},
+    {"for": 1.2, "clawd": {"to": [0.43, 0.7], "pose": "walk"}, "shell": {"to": [0.57, 0.7]}},
+    {"for": 1, "clawd": {"pose": "type", "say": "fit the pieces"}, "machine": {"show": true, "pose": "base"}, "plank": {"show": false}, "shell": {"show": false}},
+    {"for": 1, "clawd": {"pose": "dig"}, "machine": {"pose": "half"}},
+    {"for": 1, "clawd": {"pose": "idle", "say": "ready"}, "machine": {"pose": "done"}},
+    {"for": 1.2, "clawd": {"pose": "type", "say": "split the wood"}, "machine": {"pose": "use"}},
+    {"for": 0.8, "clawd": {"pose": "wave", "say": "made it"}, "machine": {"pose": "done"}}
+  ]
+}
