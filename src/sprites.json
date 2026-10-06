@@ -27,7 +27,6 @@
 "net":{"color":"ink","poses":{"up":{"every":1,"frames":[[".______.","|######|","|      |","|      |"]]}}},
 "umbrella":{"color":"sun","poses":{"open":{"every":1,"frames":[["  .-'''-.  "," /_.-.-._\\ ","     |     ","     |     ","     |     "]]}}},
 "blanket":{"color":"wood","poses":{"flat":{"every":1,"frames":[["▄▄▄▄▄▄▄▄▄▄▄"]]}}},
-"laptop":{"color":"ink","poses":{"open":{"every":0.6,"frames":[[" ___ ","|_._|","/___\\"],[" ___ ","|_:_|","/___\\"]]}}},
 "castle":{"color":"wood","poses":{"base":{"every":1,"frames":[["       ","       "," _____ ","|_____|"]]},
 "half":{"every":1,"frames":[["       "," |^ ^| "," |_ _| ","|_____|"]]},
 "done":{"every":1,"frames":[["  ^ ^  "," |#|#| "," |___| ","|_____|"]]}}}}
