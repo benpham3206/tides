@@ -79,8 +79,8 @@ function world(deny) {
 // ---------- pages ----------
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const day = (date, opts) => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-GB', { timeZone: 'UTC', ...opts });
-const when = (p) => `${p.tide === 'high' ? 'High' : 'Low'} tide, ${day(p.date, { weekday: 'long' })} ${p.tide === 'high' ? 'morning' : 'night'}`;
+const day = (date, opts) => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric', ...opts }); // Tuesday, October 6
+const when = (p) => `${p.tide === 'high' ? 'High' : 'Low'} tide, ${p.tide === 'high' ? 'morning' : 'night'}`;
 
 const CLAWD = '<path d="M32 56h104v64H32zM16 88h136v16H16zM32 120h8v16h-8zM48 120h8v16h-8zM112 120h8v16h-8zM128 120h8v16h-8z"/>';
 const EYES = '<path d="M56 72h8v16h-8zM104 72h8v16h-8z"/>';
@@ -193,7 +193,7 @@ function journal(posts) {
   return Array.from({ length: pages }, (_, i) => {
     const n = i + 1, root = n === 1 ? '../' : '../../../';
     const sections = days.slice(i * DAYS_PER_PAGE, n * DAYS_PER_PAGE).map(([date, ps]) => `<section class="day">
-<h2 class="brush">${day(date, { weekday: 'long', day: 'numeric', month: 'long' })}</h2>
+<h2 class="brush">${day(date)}</h2>
 <ul>${ps.map((p) => `<li><span class="quiet">${p.tide === 'high' ? 'High tide' : 'Low tide'}</span><a href="${root}blog/${p.slug}/">${esc(p.title)}</a></li>`).join('')}</ul>
 </section>`);
     const nav = pages > 1 ? turn(n < pages && { href: `${root}${at(n + 1)}`, label: 'Older' }, n > 1 && { href: `${root}${at(n - 1)}`, label: 'Newer' },
@@ -210,7 +210,7 @@ function entry(p, newer, older) {
     root: '../../', title: `${p.title} · Tides`, description: p.body.split('\n\n')[0].slice(0, 160),
     body: `<div class="page">${header('../../')}<main class="entry"><article>
 <h1 class="brush">${esc(p.title)}</h1>
-<p class="byline quiet">${when(p)}, ${day(p.date, { day: 'numeric', month: 'long', year: 'numeric' })}. A ${NUMBERS[p.minutes] ?? p.minutes}-minute read.</p>
+<p class="byline quiet">${day(p.date)}. ${when(p)}. A ${NUMBERS[p.minutes] ?? p.minutes}-minute read.</p>
 ${marked.parse(p.body)}
 ${seal('var(--paper)')}
 </article></main>
@@ -243,7 +243,7 @@ if (!process.argv.includes('--check')) {
   posts.forEach((p, i) => write(`dist/blog/${p.slug}/index.html`, entry(p, posts[i - 1], posts[i + 1])));
   write('dist/feed.xml', feed(posts));
   // The journal's search box loads this: every entry's title, date, and words, newest first.
-  write('dist/search.json', JSON.stringify(posts.map((p) => ({ title: p.title, slug: p.slug, when: `${when(p)}, ${day(p.date, { day: 'numeric', month: 'long', year: 'numeric' })}`, text: p.body }))));
+  write('dist/search.json', JSON.stringify(posts.map((p) => ({ title: p.title, slug: p.slug, when: `${day(p.date)} · ${when(p)}`, text: p.body }))));
   write('dist/seal.svg', seal('#f1ece2').replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"'));
   console.log(`built dist/ (${posts.length} entries)`);
 }

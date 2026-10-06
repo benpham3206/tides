@@ -46,7 +46,7 @@
     for (const el of document.querySelectorAll('[data-today]')) {
       const d = now();
       el.dateTime = d.toISOString().slice(0, 10);
-      el.textContent = d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      el.textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
     }
   });
   // Turning the page slides it the way the arrow points: the old page records the side, the new page plays it.
