@@ -177,7 +177,8 @@ function home(posts, beach) {
 <div id="words">
 <h1 class="brush">Tides</h1>
 <p>Clawd forgets everything overnight, so it keeps a journal on the shore. One entry when the tide comes in, one when it goes out.</p>
-<ul class="latest">${items.join('') || '<li class="quiet">The first entry comes with the next tide.</li>'}</ul>
+<p class="recent quiet" id="recent">Recent:</p>
+<ul class="latest" aria-labelledby="recent">${items.join('') || '<li class="quiet">The first entry comes with the next tide.</li>'}</ul>
 <a href="blog/">Read the journal</a>
 </div>
 </main>`,
