@@ -51,7 +51,7 @@
   }
   // ponytail: pickups last for this page session; persist consumed placements if repeat visits need scarcity.
   const game = tides.game = { mode: 'ambient', scene: 'home', player: { x: 0.6, y: 0.75, facing: 'right', moving: false }, save, items, slide: null, update, scenery };
-  let last = null, pending = null, floating = null;
+  let last = null, pending = null, floating = null, panning = false;
   const clear = () => { keys.clear(); game.player.moving = false; };
   function exit() {
     clear(); pending = null; floating = null; game.slide = null;
@@ -80,6 +80,11 @@
     if (game.mode === 'ambient') {
       if (key === 'e') return;
       game.mode = 'play'; hud.hidden = false; last = null;
+      // Take Clawd from wherever it is. Away off to the right means it is in Monterey: pan there.
+      const p = game.player, seen = tides.clawd?.where?.();
+      if (seen) { p.x = seen.x; p.y = Math.max(-1.4, Math.min(1, seen.y)); }
+      panning = p.x > 1 && !!tides.scenes?.monterey;
+      p.x = panning ? 0.1 : Math.max(0, Math.min(1, p.x));
       announce('You are walking Clawd. Escape to stop.');
     }
     event.preventDefault();
@@ -95,9 +100,14 @@
     const dt = last === null ? 0 : Math.max(0, Math.min(0.125, t - last));
     last = t;
     if (game.mode === 'ambient') return;
+    if (panning) {
+      panning = false; game.mode = 'slide'; clear();
+      game.slide = { from: 'home', to: 'monterey', direction: 1, start: t, pan: true };
+    }
     if (game.mode === 'slide') {
       if (t - game.slide.start >= 0.6) {
-        game.scene = game.slide.to; game.player.x = game.slide.direction > 0 ? 0 : 1;
+        game.scene = game.slide.to;
+        if (!game.slide.pan) game.player.x = game.slide.direction > 0 ? 0 : 1;
         game.slide = null; game.mode = 'play'; clear();
       }
       return;
@@ -117,7 +127,7 @@
     p.moving = length > 0;
     if (dx) p.facing = dx < 0 ? 'left' : 'right';
     if (length) { p.x += dx / length * 0.25 * dt; p.y += dy / length * 0.25 * dt; }
-    p.y = Math.max(-0.3, Math.min(1, p.y));
+    p.y = Math.max(-1.4, Math.min(1, p.y));
     const to = game.scene === 'home' && p.x > 1 ? 'monterey' : game.scene === 'monterey' && p.x < 0 ? 'home' : null;
     p.x = Math.max(0, Math.min(1, p.x));
     if (to) {
