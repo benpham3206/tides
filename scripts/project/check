@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Checks every entry, sprite, and act (privacy, length, act contract).
+set -euo pipefail
+node build.mjs --check

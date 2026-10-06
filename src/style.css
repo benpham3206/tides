@@ -1,0 +1,153 @@
+/* Tides. Laid paper tinted by the reader's hour; brush titles; text that sits in the paper like ink. */
+
+:root {
+  --clawd: #d77757; --eye: #1b1a18; /* Clawd's own colour, and nothing else uses it */
+  --paper: #ecebe3; --ink: #24231f; --wash: #4f8196; --sun: #b78a3c; --moon: #8d8a80; --land: #5d6f55; --bamboo: #a8875a; --lamp: #e0a64a;
+  --brush: "Hina Mincho", "Zen Old Mincho", serif;
+  --serif: "Zen Old Mincho", "Iowan Old Style", Georgia, serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+[data-sky="dawn"]  { --paper: #eee3dd; --ink: #2b2523; --wash: #7d7a96; --sun: #c8644a; --moon: #9a8f8c; --land: #5f5a66; --bamboo: #a07f62; }
+[data-sky="dusk"]  { --paper: #ebdac2; --ink: #2c241c; --wash: #84685e; --sun: #b9502f; --moon: #8f7a66; --land: #4a3b33; --bamboo: #94673f; }
+[data-sky="night"] { --paper: #1b2130; --ink: #e2dccb; --wash: #7d8aa6; --sun: #e2dccb; --moon: #efe8d3; --land: #6d7690; --bamboo: #8a7a62; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+
+html {
+  background-color: var(--paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .33 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(90deg, transparent 0 117px, color-mix(in srgb, var(--ink) 6%, transparent) 117px 119px, transparent 119px 120px),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent) 0 1px, transparent 1px 4px);
+  color: var(--ink);
+  font: 400 clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem)/1.8 var(--serif);
+  transition: background-color 4s, color 4s;
+  -webkit-font-smoothing: antialiased;
+}
+body { margin: 0; min-height: 100svh; }
+
+/* Ink: brush titles bleed into the paper; body text gets a lighter touch so it stays easy to read. */
+.brush { font-family: var(--brush); font-weight: 400; filter: url(#ink); letter-spacing: 0.01em; }
+p, li { text-shadow: 0 0 0.6px color-mix(in srgb, var(--ink) 55%, transparent); }
+
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28em; text-decoration-color: color-mix(in srgb, var(--ink) 40%, transparent); }
+a:hover { text-decoration-color: var(--ink); }
+:focus-visible { outline: 1.5px dashed var(--ink); outline-offset: 5px; border-radius: 2px; }
+.defs { position: absolute; width: 0; height: 0; }
+.quiet { color: color-mix(in srgb, var(--ink) 62%, transparent); font-style: italic; }
+
+/* Home: the beach */
+.home { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+#beach {
+  position: absolute; inset: 0; margin: 0;
+  font: 400 clamp(12px, 0.55rem + 0.35vw, 15px)/1.25 var(--mono);
+  white-space: pre; overflow: hidden; user-select: none;
+  filter: url(#ink-soft);
+}
+#beach .sea { color: var(--wash); opacity: 0.6; }
+#beach .far { opacity: 0.45; }
+#beach .crest { color: var(--wash); }
+#beach .foam { opacity: 0.6; }
+#beach .white { opacity: 0.85; font-weight: 700; }
+#beach .face { color: var(--wash); opacity: 0.45; }
+#beach .spray { opacity: 0.5; }
+#beach .sand { opacity: 0.3; }
+#beach .star { opacity: 0.7; }
+#beach .sun { color: var(--sun); }
+#beach .moon { color: var(--moon); }
+#beach .dark { opacity: 0.35; }
+#beach .faint { opacity: 0.3; }
+#beach .cloud { opacity: 0.4; }
+#beach .land { color: var(--land); opacity: 0.85; }
+#beach .top { opacity: 0.6; }
+#beach .town { color: var(--land); opacity: 0.45; }
+#beach .lamp { color: var(--lamp); }
+#beach .rail { opacity: 0.75; }
+#beach .bamboo { color: var(--bamboo); opacity: 0.8; }
+#beach .machine { opacity: 0.85; }
+#beach .wood, #beach .castle { color: var(--bamboo); }
+#beach .kite { color: var(--sun); }
+#beach .string, #beach .shadow { opacity: 0.4; }
+#beach .print { opacity: 0.35; }
+#beach .p1 { opacity: 0.28; } #beach .p2 { opacity: 0.2; } #beach .p3 { opacity: 0.12; } #beach .p4 { opacity: 0.06; }
+#beach .clawd { color: var(--clawd); }
+#pixels { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }
+#beach .say { font-weight: 700; }
+#beach .c-sun { color: var(--sun); } #beach .c-sea { color: var(--wash); } #beach .c-wood { color: var(--bamboo); }
+#beach .c-land { color: var(--land); } #beach .c-lamp { color: var(--lamp); } #beach .c-moon { color: var(--moon); }
+#beach .c-clawd { color: var(--clawd); } #beach .c-sand { opacity: 0.6; }
+#beach .o0 { opacity: 0; } #beach .o1 { opacity: 0.25; } #beach .o2 { opacity: 0.5; } #beach .o3 { opacity: 0.75; }
+#beach .zz, #beach .fleck { opacity: 0.7; }
+#beach .spark { color: var(--lamp); }
+#beach .fire { color: var(--lamp); text-shadow: 0 0 6px var(--lamp); }
+#beach .ember { color: var(--sun); }
+
+#words {
+  position: absolute; left: clamp(1.25rem, 6vw, 6rem); bottom: calc(2 * 1.25 * clamp(12px, 0.55rem + 0.35vw, 15px) + clamp(1.25rem, 5svh, 3rem));
+  max-width: min(30rem, calc(100% - 2.5rem));
+}
+#words h1 { font-size: clamp(3.6rem, 2.6rem + 5vw, 7rem); line-height: 1; margin: 0 0 0.2em; }
+#words p { margin: 0 0 1.1em; max-width: 26em; }
+.latest { list-style: none; padding: 0; margin: 0 0 1.4em; }
+.latest li + li { margin-top: 0.35em; }
+.latest .quiet { display: block; font-size: 0.82em; line-height: 1.4; }
+
+/* Journal and entries */
+.page { max-width: 38rem; margin: 0 auto; padding: clamp(2rem, 8vh, 5rem) 1.5rem 6rem; }
+.page > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: clamp(2.5rem, 9vh, 5rem); }
+.page > header a { text-decoration: none; }
+.page > header nav { display: flex; gap: 1.4rem; }
+.home-link { font-size: 2.6rem; line-height: 1; display: inline-block; }
+.home-link span { display: inline-block; }
+.home-link:hover span, .home-link:focus-visible span { animation: swell 1.8s ease-in-out infinite; animation-delay: calc(var(--i) * 0.11s); }
+@keyframes swell { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-0.14em) rotate(-3deg); } 65% { transform: translateY(0.04em) rotate(1deg); } }
+.today { display: block; font-size: 0.8em; margin-top: 0.3rem; min-height: 1.4em; }
+.turn .quiet { align-self: center; }
+.turn a { text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.3s; }
+.turn .glyph { width: 1.4em; height: 1.4em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0.55; transition: opacity 0.3s; }
+.turn a:hover .glyph, .turn a:focus-visible .glyph { opacity: 1; }
+.turn a[data-arrow="left"]:hover, .turn a[data-arrow="left"]:focus-visible { transform: translateX(-0.3rem); }
+.turn a[data-arrow="right"]:hover, .turn a[data-arrow="right"]:focus-visible { transform: translateX(0.3rem); }
+/* On a wide screen an entry's arrows wait at the edges of the page, and name their entry on hover. */
+@media (min-width: 64rem) {
+  .entry + .turn a { position: fixed; top: 50%; translate: 0 -50%; font-size: 0.85rem; }
+  .entry + .turn a[data-arrow="left"] { left: clamp(1rem, 4vw, 3rem); }
+  .entry + .turn a[data-arrow="right"] { right: clamp(1rem, 4vw, 3rem); }
+  .entry + .turn .glyph { width: 2.6rem; height: 2.6rem; stroke-width: 1.4; }
+  .entry + .turn .label { position: absolute; top: 100%; margin-top: 0.4rem; width: 9rem; font-style: italic; opacity: 0; transition: opacity 0.3s; }
+  .entry + .turn [data-arrow="left"] .label { left: 0; }
+  .entry + .turn [data-arrow="right"] .label { right: 0; text-align: right; }
+  .entry + .turn a:hover .label, .entry + .turn a:focus-visible .label { opacity: 0.8; }
+}
+/* The page slides like a leaf: ← brings the older page in from the left, → the newer from the right. */
+@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }
+.page main { view-transition-name: leaf; }
+::view-transition-group(leaf) { animation-duration: 0.5s; }
+html:active-view-transition-type(left)::view-transition-old(leaf) { animation: 0.4s ease-in both leaf-out-right; }
+html:active-view-transition-type(left)::view-transition-new(leaf) { animation: 0.5s 0.1s ease-out both leaf-in-left; }
+html:active-view-transition-type(right)::view-transition-old(leaf) { animation: 0.4s ease-in both leaf-out-left; }
+html:active-view-transition-type(right)::view-transition-new(leaf) { animation: 0.5s 0.1s ease-out both leaf-in-right; }
+@keyframes leaf-out-left { to { transform: translateX(-8vw); opacity: 0; filter: blur(2px); } }
+@keyframes leaf-out-right { to { transform: translateX(8vw); opacity: 0; filter: blur(2px); } }
+@keyframes leaf-in-left { from { transform: translateX(-8vw); opacity: 0; filter: blur(2px); } }
+@keyframes leaf-in-right { from { transform: translateX(8vw); opacity: 0; filter: blur(2px); } }
+
+.day { margin: 0 0 3rem; }
+.day h2 { font-size: 1.9rem; margin: 0 0 0.6rem; line-height: 1.2; }
+.day ul { list-style: none; padding: 0; margin: 0; }
+.day li { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: 0.3rem 0; }
+
+article h1 { font-size: clamp(2.4rem, 1.8rem + 3vw, 3.6rem); line-height: 1.12; margin: 0 0 0.3em; }
+article .byline { margin: 0 0 2.8rem; }
+article p { margin: 0 0 1.25em; hyphens: auto; }
+article .seal { display: block; width: 3.4rem; margin: 3rem 0 0 auto; transform: rotate(-4deg); filter: url(#stamp); }
+.turn { display: flex; justify-content: space-between; gap: 2rem; margin-top: 4rem; font-size: 0.9em; }
+
+@media (max-width: 40rem) {
+  .day li { grid-template-columns: 1fr; gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { transition: none; }
+  .turn a { transition: none; }
+  .home-link:hover span, .home-link:focus-visible span { animation: none; }
+}

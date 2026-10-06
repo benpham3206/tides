@@ -1,0 +1,111 @@
+{
+ "title": "follows a crab to the water",
+ "when": [
+  "dawn",
+  "day",
+  "dusk"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.55,
+    0.5
+   ]
+  },
+  "crab": {
+   "sprite": "crab",
+   "at": [
+    1.2,
+    0.3
+   ],
+   "pose": "walk"
+  }
+ },
+ "beats": [
+  {
+   "for": 6,
+   "crab": {
+    "to": [
+     0.7,
+     0.35
+    ]
+   },
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 1.5,
+   "crab": {
+    "pose": "rest"
+   },
+   "clawd": {
+    "say": "?"
+   }
+  },
+  {
+   "for": 5,
+   "crab": {
+    "to": [
+     0.45,
+     0.25
+    ],
+    "pose": "walk"
+   },
+   "clawd": {
+    "to": [
+     0.55,
+     0.38
+    ],
+    "pose": "sneak"
+   }
+  },
+  {
+   "for": 4,
+   "crab": {
+    "to": [
+     0.3,
+     0.1
+    ]
+   },
+   "clawd": {
+    "to": [
+     0.4,
+     0.24
+    ]
+   }
+  },
+  {
+   "for": 2,
+   "crab": {
+    "pose": "rest"
+   },
+   "clawd": {
+    "pose": "idle",
+    "say": "hi"
+   }
+  },
+  {
+   "for": 4,
+   "crab": {
+    "to": [
+     0.25,
+     -0.2
+    ],
+    "pose": "walk"
+   },
+   "clawd": {
+    "pose": "wave"
+   }
+  },
+  {
+   "for": 2,
+   "crab": {
+    "show": false
+   },
+   "clawd": {
+    "pose": "sit"
+   }
+  }
+ ]
+}

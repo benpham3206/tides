@@ -1,0 +1,15 @@
+{
+  "name": "tides",
+  "version": "1.0.0",
+  "description": "Clawd's journal on the shore.",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node build.mjs --check",
+    "dev": "node build.mjs && python3 -m http.server -d dist 4321"
+  },
+  "dependencies": {
+    "marked": "^18.1.0"
+  },
+  "private": true,
+  "type": "module"
+}

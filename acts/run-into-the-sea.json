@@ -1,0 +1,79 @@
+{
+ "title": "runs into the sea",
+ "when": [
+  "day"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.55,
+    0.4
+   ]
+  }
+ },
+ "beats": [
+  {
+   "for": 1,
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "to": [
+     0.55,
+     0.02
+    ],
+    "pose": "run"
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "to": [
+     0.56,
+     -0.25
+    ],
+    "pose": "swim"
+   }
+  },
+  {
+   "for": 6,
+   "clawd": {
+    "to": [
+     0.6,
+     -0.3
+    ]
+   }
+  },
+  {
+   "for": 1.2,
+   "clawd": {
+    "say": "cold!"
+   }
+  },
+  {
+   "for": 2.5,
+   "clawd": {
+    "to": [
+     0.6,
+     0.2
+    ],
+    "pose": "run"
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "dig"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "sit"
+   }
+  }
+ ]
+}

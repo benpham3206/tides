@@ -1,0 +1,124 @@
+{
+ "title": "chases a gull along the water",
+ "when": [
+  "day",
+  "dusk"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.2,
+    0.3
+   ]
+  },
+  "gull": {
+   "sprite": "gull",
+   "at": [
+    0.35,
+    0.15
+   ],
+   "pose": "walk"
+  }
+ },
+ "beats": [
+  {
+   "for": 1.5,
+   "clawd": {
+    "pose": "idle",
+    "say": "!"
+   }
+  },
+  {
+   "for": 4,
+   "clawd": {
+    "to": [
+     0.55,
+     0.2
+    ],
+    "pose": "run"
+   },
+   "gull": {
+    "to": [
+     0.75,
+     0.1
+    ]
+   }
+  },
+  {
+   "for": 1,
+   "clawd": {
+    "to": [
+     0.66,
+     0.15
+    ]
+   },
+   "gull": {
+    "to": [
+     0.82,
+     0.08
+    ],
+    "pose": "fly",
+    "hop": 3
+   }
+  },
+  {
+   "for": 4,
+   "clawd": {
+    "to": [
+     0.76,
+     0.12
+    ]
+   },
+   "gull": {
+    "to": [
+     0.3,
+     0.12
+    ],
+    "pose": "walk"
+   }
+  },
+  {
+   "for": 0.8,
+   "clawd": {
+    "pose": "idle",
+    "say": "?"
+   }
+  },
+  {
+   "for": 5,
+   "clawd": {
+    "to": [
+     0.35,
+     0.15
+    ],
+    "pose": "run"
+   },
+   "gull": {
+    "to": [
+     0.15,
+     0.1
+    ]
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "jump",
+    "hop": 2
+   },
+   "gull": {
+    "to": [
+     -0.4,
+     -2.2
+    ],
+    "pose": "fly"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "sit"
+   }
+  }
+ ]
+}

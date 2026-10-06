@@ -1,0 +1,116 @@
+{
+ "title": "works on a laptop under an umbrella",
+ "when": [
+  "day"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.62,
+    0.78
+   ]
+  },
+  "umbrella": {
+   "sprite": "umbrella",
+   "at": [
+    0.64,
+    0.76
+   ],
+   "hidden": true
+  },
+  "blanket": {
+   "sprite": "blanket",
+   "at": [
+    0.7,
+    0.8
+   ],
+   "hidden": true
+  },
+  "laptop": {
+   "sprite": "laptop",
+   "at": [
+    0.77,
+    0.83
+   ],
+   "hidden": true
+  }
+ },
+ "beats": [
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "dig"
+   }
+  },
+  {
+   "for": 0.5,
+   "umbrella": {
+    "show": true
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "dig"
+   },
+   "blanket": {
+    "show": true
+   }
+  },
+  {
+   "for": 1.5,
+   "clawd": {
+    "to": [
+     0.69,
+     0.79
+    ],
+    "pose": "walk"
+   },
+   "laptop": {
+    "show": true
+   }
+  },
+  {
+   "for": 600,
+   "clawd": {
+    "pose": "type"
+   }
+  },
+  {
+   "for": 4,
+   "clawd": {
+    "pose": "idle",
+    "say": "hmm"
+   }
+  },
+  {
+   "for": 600,
+   "clawd": {
+    "pose": "type"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "jump",
+    "hop": 1,
+    "say": "done!"
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "dig"
+   },
+   "laptop": {
+    "show": false
+   },
+   "blanket": {
+    "show": false
+   },
+   "umbrella": {
+    "show": false
+   }
+  }
+ ]
+}

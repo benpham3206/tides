@@ -1,0 +1,37 @@
+{
+ "title": "waves at you",
+ "when": [
+  "dawn",
+  "day",
+  "dusk"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.72,
+    0.88
+   ]
+  }
+ },
+ "beats": [
+  {
+   "for": 1,
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 4,
+   "clawd": {
+    "pose": "wave",
+    "say": "hi"
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "idle"
+   }
+  }
+ ]
+}

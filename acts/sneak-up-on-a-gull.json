@@ -1,0 +1,82 @@
+{
+ "title": "sneaks up on a gull",
+ "when": [
+  "dawn",
+  "day",
+  "dusk"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.25,
+    0.5
+   ]
+  },
+  "gull": {
+   "sprite": "gull",
+   "at": [
+    0.62,
+    0.35
+   ],
+   "pose": "sit"
+  }
+ },
+ "beats": [
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "idle",
+    "say": "!"
+   }
+  },
+  {
+   "for": 10,
+   "clawd": {
+    "to": [
+     0.52,
+     0.4
+    ],
+    "pose": "sneak"
+   }
+  },
+  {
+   "for": 1.5,
+   "clawd": {
+    "pose": "idle"
+   },
+   "gull": {
+    "say": "?"
+   }
+  },
+  {
+   "for": 2.5,
+   "clawd": {
+    "to": [
+     0.6,
+     0.36
+    ],
+    "pose": "run"
+   },
+   "gull": {
+    "to": [
+     1.2,
+     -2.4
+    ],
+    "pose": "fly"
+   }
+  },
+  {
+   "for": 0.6,
+   "clawd": {
+    "pose": "jump",
+    "hop": 2
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "sit"
+   }
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "title": "builds a sandcastle",
+ "when": [
+  "day",
+  "dusk"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.35,
+    0.7
+   ]
+  },
+  "castle": {
+   "sprite": "castle",
+   "at": [
+    0.43,
+    0.7
+   ],
+   "pose": "base",
+   "hidden": true
+  }
+ },
+ "beats": [
+  {
+   "for": 20,
+   "clawd": {
+    "pose": "dig"
+   }
+  },
+  {
+   "for": 0.1,
+   "castle": {
+    "show": true
+   }
+  },
+  {
+   "for": 25,
+   "clawd": {
+    "pose": "dig"
+   }
+  },
+  {
+   "for": 0.1,
+   "castle": {
+    "pose": "half"
+   }
+  },
+  {
+   "for": 25,
+   "clawd": {
+    "pose": "dig"
+   }
+  },
+  {
+   "for": 0.1,
+   "castle": {
+    "pose": "done"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "jump",
+    "hop": 1,
+    "say": "ta-da"
+   }
+  },
+  {
+   "for": 30,
+   "clawd": {
+    "pose": "sit"
+   }
+  }
+ ]
+}

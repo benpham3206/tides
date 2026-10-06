@@ -1,0 +1,52 @@
+{
+ "title": "counts the stars",
+ "when": [
+  "night"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.5,
+    0.45
+   ]
+  }
+ },
+ "beats": [
+  {
+   "for": 30,
+   "clawd": {
+    "pose": "sit"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "say": "forty-one"
+   }
+  },
+  {
+   "for": 25,
+   "clawd": {}
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "say": "forty-two"
+   }
+  },
+  {
+   "for": 20,
+   "clawd": {}
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "say": "...one more"
+   }
+  },
+  {
+   "for": 15,
+   "clawd": {}
+  }
+ ]
+}

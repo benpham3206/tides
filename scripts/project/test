@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# The act contract refuses bad acts, and the built page cannot be broken out of.
+set -euo pipefail
+node test/acts.test.mjs

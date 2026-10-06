@@ -1,0 +1,446 @@
+{
+ "title": "plays volleyball with friends",
+ "when": [
+  "day"
+ ],
+ "cast": {
+  "clawd": {
+   "at": [
+    0.44,
+    0.72
+   ]
+  },
+  "net": {
+   "sprite": "net",
+   "at": [
+    0.61,
+    0.6
+   ]
+  },
+  "left": {
+   "sprite": "human",
+   "at": [
+    1.3,
+    0.55
+   ],
+   "pose": "walk"
+  },
+  "right": {
+   "sprite": "human",
+   "at": [
+    1.35,
+    0.45
+   ],
+   "pose": "walk"
+  },
+  "pal": {
+   "sprite": "clawd",
+   "at": [
+    1.4,
+    0.8
+   ],
+   "pose": "walk"
+  },
+  "ball": {
+   "sprite": "ball",
+   "at": [
+    0.46,
+    0.7
+   ],
+   "hidden": true
+  }
+ },
+ "beats": [
+  {
+   "for": 6,
+   "pal": {
+    "to": [
+     0.78,
+     0.74
+    ],
+    "pose": "walk"
+   },
+   "left": {
+    "to": [
+     0.5,
+     0.46
+    ],
+    "pose": "walk"
+   },
+   "right": {
+    "to": [
+     0.74,
+     0.48
+    ],
+    "pose": "walk"
+   },
+   "clawd": {
+    "pose": "idle",
+    "say": "game?"
+   }
+  },
+  {
+   "for": 1,
+   "pal": {
+    "pose": "idle"
+   },
+   "left": {
+    "pose": "stand"
+   },
+   "right": {
+    "pose": "stand"
+   },
+   "ball": {
+    "show": true,
+    "to": [
+     0.44,
+     0.52
+    ]
+   }
+  },
+  {
+   "for": 1.6,
+   "ball": {
+    "to": [
+     0.74,
+     0.28
+    ],
+    "hop": 7
+   },
+   "clawd": {
+    "pose": "jump",
+    "hop": 1
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.78,
+     0.54
+    ],
+    "hop": 4
+   },
+   "right": {
+    "pose": "bump",
+    "hop": 0
+   },
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.74,
+     0.28
+    ],
+    "hop": 6
+   },
+   "pal": {
+    "pose": "dig",
+    "hop": 0
+   },
+   "right": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.5,
+     0.26
+    ],
+    "hop": 2
+   },
+   "right": {
+    "pose": "jump",
+    "hop": 1
+   },
+   "pal": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.44,
+     0.52
+    ],
+    "hop": 4
+   },
+   "left": {
+    "pose": "bump",
+    "hop": 0
+   },
+   "right": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.5,
+     0.26
+    ],
+    "hop": 6
+   },
+   "clawd": {
+    "pose": "dig",
+    "hop": 0
+   },
+   "left": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.78,
+     0.54
+    ],
+    "hop": 2
+   },
+   "left": {
+    "pose": "jump",
+    "hop": 1
+   },
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.74,
+     0.28
+    ],
+    "hop": 4
+   },
+   "pal": {
+    "pose": "dig",
+    "hop": 0
+   },
+   "left": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.78,
+     0.54
+    ],
+    "hop": 6
+   },
+   "right": {
+    "pose": "bump",
+    "hop": 0
+   },
+   "pal": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.61,
+     0.58
+    ],
+    "hop": 2
+   },
+   "pal": {
+    "pose": "jump",
+    "hop": 1
+   },
+   "right": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.6,
+     0.62
+    ],
+    "hop": 0
+   },
+   "pal": {
+    "pose": "idle",
+    "say": "oops"
+   }
+  },
+  {
+   "for": 3,
+   "clawd": {
+    "pose": "jump",
+    "hop": 2,
+    "say": "point!"
+   },
+   "left": {
+    "pose": "cheer"
+   },
+   "right": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 1.2,
+   "clawd": {
+    "pose": "idle"
+   },
+   "left": {
+    "pose": "stand"
+   },
+   "ball": {
+    "to": [
+     0.74,
+     0.28
+    ],
+    "hop": 3
+   }
+  },
+  {
+   "for": 1.6,
+   "ball": {
+    "to": [
+     0.44,
+     0.52
+    ],
+    "hop": 7
+   },
+   "right": {
+    "pose": "jump",
+    "hop": 1
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.5,
+     0.26
+    ],
+    "hop": 4
+   },
+   "clawd": {
+    "pose": "dig",
+    "hop": 0
+   },
+   "right": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 1.1,
+   "ball": {
+    "to": [
+     0.44,
+     0.52
+    ],
+    "hop": 6
+   },
+   "left": {
+    "pose": "bump",
+    "hop": 0
+   },
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.82,
+     0.9
+    ],
+    "hop": 2
+   },
+   "clawd": {
+    "pose": "jump",
+    "hop": 1,
+    "say": "spike!"
+   },
+   "left": {
+    "pose": "stand"
+   }
+  },
+  {
+   "for": 0.8,
+   "ball": {
+    "to": [
+     0.83,
+     0.95
+    ],
+    "hop": 0
+   },
+   "clawd": {
+    "pose": "idle"
+   }
+  },
+  {
+   "for": 3,
+   "pal": {
+    "pose": "jump",
+    "hop": 2
+   },
+   "right": {
+    "pose": "cheer",
+    "say": "nice one"
+   },
+   "left": {
+    "pose": "cheer"
+   },
+   "clawd": {
+    "pose": "wave"
+   }
+  },
+  {
+   "for": 7,
+   "pal": {
+    "to": [
+     1.35,
+     0.75
+    ],
+    "pose": "walk"
+   },
+   "right": {
+    "to": [
+     1.3,
+     0.5
+    ],
+    "pose": "walk"
+   },
+   "left": {
+    "to": [
+     1.3,
+     0.6
+    ],
+    "pose": "walk"
+   },
+   "ball": {
+    "show": false
+   },
+   "clawd": {
+    "pose": "wave",
+    "say": "bye"
+   }
+  },
+  {
+   "for": 2,
+   "clawd": {
+    "pose": "idle"
+   }
+  }
+ ]
+}

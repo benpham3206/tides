@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Builds the site into dist/.
+set -euo pipefail
+node build.mjs
