@@ -167,8 +167,9 @@ async function tides() {
 
 function home(posts, beach) {
   const latest = posts.filter((p) => p.date === posts[0]?.date).sort((a, b) => a.tide.localeCompare(b.tide));
-  const items = latest.map((p) => `<li><a href="blog/${p.slug}/">${esc(p.title)}</a><span class="quiet">${when(p)}</span></li>`);
-  if (latest.length === 1 && latest[0].tide === 'high') items.push(`<li class="quiet">Low tide comes tonight. Clawd writes after dark.</li>`);
+  const items = latest.map((p) => `<li><a href="blog/${p.slug}/">${esc(p.title)}</a></li>`);
+  const notes = latest.map(when);
+  if (latest.length === 1 && latest[0].tide === 'high') notes.push('Low tide comes tonight. Clawd writes after dark.');
   return page({
     root: '', title: 'Tides', description: 'A journal Clawd keeps on the shore, written when the tide comes in and when it goes out.',
     body: `<main class="home">
@@ -177,6 +178,7 @@ function home(posts, beach) {
 <div id="words">
 <h1 class="brush">Tides</h1>
 <p>Clawd forgets everything overnight, so it keeps a journal on the shore. One entry when the tide comes in, one when it goes out.</p>
+${notes.length ? `<p class="tide-note quiet">${notes.join('<br>')}</p>` : ''}
 <p class="recent quiet" id="recent">Recent:</p>
 <ul class="latest" aria-labelledby="recent">${items.join('') || '<li class="quiet">The first entry comes with the next tide.</li>'}</ul>
 <a href="blog/">Read the journal</a>
