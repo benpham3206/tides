@@ -1,10 +1,12 @@
 # The secret game
 
-Press W, A, S, D, or an arrow key on the home page to walk Clawd. W and up walk toward the water. S and down walk toward you. A and left walk left. D and right walk right.
+Press W, A, S, D, or an arrow key on the home page to walk Clawd. W and up walk toward the water, and on into it: past the waterline, Clawd swims. S and down walk toward you. A and left walk left. D and right walk right.
+
+The game takes Clawd from where it stands. If Clawd is away collecting materials, the view trucks right to Monterey, where Clawd is. The sky holds still while the shore slides past.
 
 Walk past the right edge of the home beach to reach Monterey. Walk past Monterey's left edge to return. Walk onto parts to collect them. The top-right inventory shows your parts and built machines. If the inventory covers a recipe, press E to build the first affordable machine you have not built. Its cutscene pauses movement for 6–12 seconds. Escape returns Clawd to its planned day. Escape during a build cancels it without spending parts.
 
-The boat silhouette with a question mark is a future goal. You cannot build the boat in v1. The HUD scrolls horizontally when the inventory exceeds the phone width.
+After the first machine is built, the HUD shows the boat outline with a question mark: a future goal. You cannot build the boat in v1. The HUD scrolls horizontally when the inventory exceeds the phone width.
 
 ## Files
 

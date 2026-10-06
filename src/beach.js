@@ -227,7 +227,7 @@
     sceneContext.rowsOf = rowsOf;
     fences.push(...(window.tides.game?.scenery(put, sceneContext) ?? []));
     const doing = clawd.draw({ put, pix, rowsOf, spot }, sun, t, sky, fences, window.tides.game?.mode === 'slide'
-      ? (sceneId === window.tides.game.slide.from ? window.tides.game.player : null) : undefined);
+      ? (sceneId === window.tides.game.slide[window.tides.game.slide.pan ? 'to' : 'from'] ? window.tides.game.player : null) : undefined);
 
     return { ch, cl, pixels, doing, phase, d };
   }
@@ -246,10 +246,14 @@
       ch = Array.from({ length: L.rows }, () => Array(L.cols).fill(' '));
       cl = Array.from({ length: L.rows }, () => Array(L.cols).fill(''));
       pixels = [];
+      // A truck, not a pan: the sky is too far off to move, so sun, moon, stars, and clouds hold still while the shore slides past.
+      const far = (k) => /^(sun|moon|star|cloud)\b/.test(k ?? '');
+      for (let y = 0; y < L.rows; y++) for (let x = 0; x < L.cols; x++) if (far(left.cl[y][x])) { ch[y][x] = left.ch[y][x]; cl[y][x] = left.cl[y][x]; }
       for (const [part, offset] of [[left, shift], [right, shift + direction * L.cols]]) {
         for (let y = 0; y < L.rows; y++) for (let x = 0; x < L.cols; x++) {
           const c = x + offset;
-          if (c < 0 || c >= L.cols || (y >= L.clear.y0 && y < L.clear.y1 && c >= L.clear.x0 && c < L.clear.x1)) continue;
+          if (c < 0 || c >= L.cols || part.ch[y][x] === ' ' || far(part.cl[y][x])) continue;
+          if (y >= L.clear.y0 && y < L.clear.y1 && c >= L.clear.x0 && c < L.clear.x1) continue; // behind the words
           ch[y][c] = part.ch[y][x]; cl[y][c] = part.cl[y][x];
         }
         pixels.push(...part.pixels.map((p) => ({ ...p, c: p.c + offset })));

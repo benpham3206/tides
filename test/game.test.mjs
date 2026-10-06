@@ -96,6 +96,7 @@ check('secret entry, safe typing, exact announcement and complete exit', () => {
   assert.equal(live.attributes['aria-live'], 'polite');
   assert.equal(live.textContent, 'You are walking Clawd. Escape to stop.');
   assert.equal(b.nodes.find((n) => n.id === 'game-hud').hidden, false);
+  assert.doesNotMatch(b.nodes.find((n) => n.id === 'game-hud').textContent, /\?/); // no boat before the first machine
   b.key('Escape', { ctrlKey: true, target: { tagName: 'INPUT' } });
   assert.equal(b.game.mode, 'ambient');
   assert.equal(b.game.scene, 'home');
@@ -110,7 +111,7 @@ check('movement speed, facing, diagonal speed, clamp and clock discontinuity', (
   b.key('a'); b.advance(0.5); b.up('a'); assert.equal(b.game.player.facing, 'left');
   const p = { ...b.game.player }; b.key('a'); b.key('w'); b.advance(0.5); b.up('a'); b.up('w');
   assert.ok(Math.abs(Math.hypot(b.game.player.x - p.x, b.game.player.y - p.y) - 0.125) < 0.001);
-  b.key('w'); b.advance(10); b.up('w'); assert.equal(b.game.player.y, -0.3);
+  b.key('w'); b.advance(10); b.up('w'); assert.equal(b.game.player.y, -1.4); // out past the surf, swimming
   b.key('s'); b.advance(10); b.up('s'); assert.equal(b.game.player.y, 1);
   b.key('a'); b.advance(10); b.up('a'); assert.equal(b.game.player.x, 0);
   b.key('d'); const before = b.game.player.x; b.tick(1000); b.up('d');

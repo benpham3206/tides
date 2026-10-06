@@ -173,7 +173,7 @@
   //   rowsOf(frame, y)              how many text rows that pixel sprite covers
   //   spot(x, y) → {c, r}           beach coordinates to cells
   //   scenery: [{r, fn}]            things on the sand Clawd can walk behind
-  let requested;
+  let requested, seen; // seen: where the ambient Clawd last stood; x > 1 while it is away
   function playAct(act, from) {
     const compiled = compile(act, from);
     requested = { act: compiled, start: performance.now() / 1000 };
@@ -250,22 +250,25 @@
       } });
     };
 
+    if (!playing) seen = { x: 2, y: st.a?.y ?? 0.5 };
     if (st.kind === 'act') {
       const tt = T - st.t0;
-      for (const a of Object.values(st.act.actors)) {
+      for (const [name, a] of Object.entries(st.act.actors)) {
         const key = a.keys.find((kf) => tt < kf.t1) ?? a.keys.at(-1);
         if (!key.show) continue;
         const f = Math.min(1, (tt - key.t0) / (key.t1 - key.t0));
-        actor(a.sprite, key.pose, key.from.x + (key.to.x - key.from.x) * f, key.from.y + (key.to.y - key.from.y) * f, tt,
-          { hop: key.hop * Math.sin(Math.PI * f), say: key.say });
+        const x = key.from.x + (key.to.x - key.from.x) * f, y = key.from.y + (key.to.y - key.from.y) * f;
+        if (name === 'clawd' && !playing) seen = { x, y };
+        actor(a.sprite, key.pose, x, y, tt, { hop: key.hop * Math.sin(Math.PI * f), say: key.say });
       }
     } else if (st.kind !== 'away' && st.a) {
       const f = (T - st.t0) / (st.t1 - st.t0);
       const at = st.kind === 'walk' ? { x: st.a.x + (st.b.x - st.a.x) * f, y: st.a.y + (st.b.y - st.a.y) * f } : st.a;
       const moving = st.kind === 'walk' || st.kind === 'fade';
-      const pose = st.kind === 'controlled' ? (game.player.moving ? 'walk' : 'idle') : moving ? (st.carry ? 'carry' : 'walk')
+      const pose = st.kind === 'controlled' ? (game.player.y < 0 ? 'swim' : game.player.moving ? 'walk' : 'idle') : moving ? (st.carry ? 'carry' : 'walk')
         : { sleep: 'sleep', sit: 'sit', dig: 'dig', build: 'dig', look: 'idle', play: 'idle' }[st.kind];
       const fade = st.kind === 'fade' ? (st.back ? f : 1 - f) : 1;
+      if (!playing) seen = { x: at.x, y: at.y };
       if (seesaw) {
         const f = company >= 1 ? Math.floor(t / 0.5) % 4 : 2, col = 1 / (spot(1, seesaw.y).c - spot(0, seesaw.y).c);
         const end = (side, row) => ({ x: seesaw.x + side * 4.5 * col, hop: 3 - row }); // sitting on that end of the plank
@@ -288,7 +291,7 @@
 
     sprites.sort((a, b) => a.r - b.r).forEach((s) => s.fn());
 
-    if (st.kind === 'controlled') return 'You are walking Clawd. Escape to stop.';
+    if (st.kind === 'controlled') return `You are ${game.player.y < 0 ? 'swimming' : 'walking'} Clawd. Escape to stop.`;
     if (st.kind === 'act') return `Clawd ${st.act.title}.`;
     return `Clawd ${{
       sleep: 'is asleep on the sand', sit: 'sits at the water’s edge, watching the sun',
@@ -298,5 +301,5 @@
     }[st.kind]}.`;
   }
 
-  window.tides.clawd = { draw, playAct, cancelAct() { requested = undefined; } };
+  window.tides.clawd = { draw, playAct, cancelAct() { requested = undefined; }, where: () => seen };
 })();
