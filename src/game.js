@@ -27,7 +27,9 @@
   const refresh = () => {
     const inventory = parts.filter((p) => save.parts[p.id]).map((p) => `${p.name} ${save.parts[p.id]}`).join(', ') || 'empty';
     const collection = machines.filter((m) => save.built.includes(m.id)).map((m) => m.name).join(', ') || 'none';
-    hud.textContent = `${inventory} · ${collection}\n${boat?.art?.length ? boat.art.join('\n') : '? boat'}`;
+    // The boat appears as a goal once the first machine is built.
+    const goal = save.built.length ? `\n${boat?.art?.length ? boat.art.join('\n') : '? boat'}` : '';
+    hud.textContent = `${inventory} · ${collection}${goal}`;
   };
   const persist = () => { try { localStorage.setItem('tides.game.v1', JSON.stringify(save)); } catch {} refresh(); };
   refresh();

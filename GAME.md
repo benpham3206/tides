@@ -6,7 +6,7 @@ The game takes Clawd from where it stands. If Clawd is away collecting materials
 
 Walk past the right edge of the home beach to reach Monterey. Walk past Monterey's left edge to return. Walk onto parts to collect them. The top-right inventory shows your parts and built machines. If the inventory covers a recipe, press E to build the first affordable machine you have not built. Its cutscene pauses movement for 6–12 seconds. Escape returns Clawd to its planned day. Escape during a build cancels it without spending parts.
 
-The boat silhouette with a question mark is a future goal. You cannot build the boat in v1. The HUD scrolls horizontally when the inventory exceeds the phone width.
+After the first machine is built, the HUD shows the boat outline with a question mark: a future goal. You cannot build the boat in v1. The HUD scrolls horizontally when the inventory exceeds the phone width.
 
 ## Files
 

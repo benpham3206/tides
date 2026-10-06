@@ -96,6 +96,7 @@ check('secret entry, safe typing, exact announcement and complete exit', () => {
   assert.equal(live.attributes['aria-live'], 'polite');
   assert.equal(live.textContent, 'You are walking Clawd. Escape to stop.');
   assert.equal(b.nodes.find((n) => n.id === 'game-hud').hidden, false);
+  assert.doesNotMatch(b.nodes.find((n) => n.id === 'game-hud').textContent, /\?/); // no boat before the first machine
   b.key('Escape', { ctrlKey: true, target: { tagName: 'INPUT' } });
   assert.equal(b.game.mode, 'ambient');
   assert.equal(b.game.scene, 'home');
