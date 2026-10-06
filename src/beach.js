@@ -43,7 +43,7 @@
     // Wide screens: the words sit on the sand and Clawd has the beach to their right.
     // Narrow screens: the whole scene fits above the words.
     const wide = clear.x1 < cols * 0.6, rail = rows - 2, top = wide ? rows : clear.y0 - 1;
-    const horizon = Math.round(top * (wide ? 0.3 : 0.36)), shore = Math.round(top * (wide ? 0.57 : 0.55));
+    const horizon = Math.round(top * (wide ? 0.3 : 0.33)), shore = Math.round(top * (wide ? 0.57 : 0.65));
     const ground = wide
       ? { x0: clear.x1 + 5, x1: cols - 6, y0: shore + 5, y1: rail - 2 }
       : { x0: 6, x1: cols - 6, y0: shore + 4, y1: Math.max(shore + 6, top - 1) };
