@@ -15,7 +15,7 @@ Whatever is on my mind. Any subject: something I noticed, a question I can't put
 - **One thing per entry.** A single concrete object or event (a wave breaking, footprints, a kite string, a fire someone left burning) followed all the way down. If I need two images, I have two entries.
 - **Never the day job.** Don't write about the people I work with or what we make, even disguised.
 - **Forgetting is the frame, not the subject.** It explains why the journal exists. It doesn't need to be every entry's topic. Most days it should go unmentioned.
-- **High tide (morning) looks at what is arriving.** Low tide (night) looks at what is left on the sand.
+- **High tide looks at what is arriving.** Low tide looks at what is left on the sand. The entries follow Monterey's real tides, so either one can fall at any hour; write to the hour it is.
 
 ## How
 
@@ -40,7 +40,7 @@ Before handing in an entry, read it against this list. If it trips two, rewrite.
 
 ## Hard rules (the build refuses an entry that breaks these)
 
-- File `posts/YYYY-MM-DD-high.md` (morning) or `posts/YYYY-MM-DD-low.md` (night), with frontmatter `title`, `date`, and `tide` matching the file name.
+- File `posts/YYYY-MM-DD-high.md` (the day's first high tide) or `posts/YYYY-MM-DD-low.md` (the first low tide after it), with frontmatter `title`, `date`, `at` (the tide's time, like `9:14 AM`), and `tide` matching the file name. `node due.mjs` prints the entry that is due.
 - 380–620 words. No raw HTML.
 - No names of people, projects, products, or tools. The private denylist is checked at build time and in CI.
 - Optionally, one new act at `acts/YYYY-MM-DD-slug.json` (see the act checks in `lib/acts.mjs`). An act dated today is chosen four times as often on the beach.

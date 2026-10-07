@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync, cpSync, ex
 import { homedir } from 'node:os';
 import { marked } from 'marked';
 import { checkSprite, checkAct } from './lib/acts.mjs';
+import { tides } from './lib/tides.mjs';
 
 const SITE_URL = (process.env.SITE_URL || 'https://benpham3206.github.io/tides/').replace(/\/?$/, '/');
 const WORDS = [380, 620]; // two to three minutes at 200-230 words a minute
@@ -47,6 +48,7 @@ function check(posts, deny) {
     if (!p.title) say('missing title');
     if (p.date !== slot[1]) say(`date "${p.date}" does not match the file name`);
     if (p.tide !== slot[2]) say(`tide "${p.tide}" does not match the file name`);
+    if (p.at !== undefined && !/^\d{1,2}:\d{2} [AP]M$/.test(p.at)) say(`at "${p.at}" must look like 9:14 AM`);
     if (p.words < WORDS[0] || p.words > WORDS[1]) say(`${p.words} words, needs ${WORDS[0]}-${WORDS[1]}`);
     if (/<\/?[a-z!]/i.test(p.body)) say('raw HTML is not allowed');
     for (const term of privateNames(deny, `${p.title}\n${p.body}`)) say(`names something private ("${term}")`);
@@ -121,7 +123,7 @@ function world(deny) {
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const day = (date, opts) => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric', ...opts }); // Tuesday, October 6
-const when = (p) => `${p.tide === 'high' ? 'High' : 'Low'} tide, ${p.tide === 'high' ? 'morning' : 'night'}`;
+const when = (p) => `${p.tide === 'high' ? 'High' : 'Low'} tide, ${p.at ?? (p.tide === 'high' ? 'morning' : 'night')}`; // at: the tide's time in Monterey
 
 const CLAWD = '<path d="M32 56h104v64H32zM16 88h136v16H16zM32 120h8v16h-8zM48 120h8v16h-8zM112 120h8v16h-8zM128 120h8v16h-8z"/>';
 const EYES = '<path d="M56 72h8v16h-8zM104 72h8v16h-8z"/>';
@@ -186,31 +188,12 @@ const arrow = (side, to) => (to ? `<a href="${to.href}" data-arrow="${side}"><sv
 const turn = (older, newer, middle = '<span></span>') => `<nav class="turn">${arrow('left', older)}${middle}${arrow('right', newer)}</nav>`;
 const DAYS_PER_PAGE = 7;
 
-// Monterey's predicted high and low tides (NOAA station 9413450), a month ahead, so the beach's water follows the real tide.
-// The site rebuilds daily; if NOAA can't be reached, the beach falls back to a simple day/night tide.
-async function tides() {
-  const d = new Date(Date.now() - 864e5), day = d.toISOString().slice(0, 10).replaceAll('-', '');
-  const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&station=9413450&datum=MLLW&interval=hilo&units=english&time_zone=gmt&format=json&application=tides&begin_date=${day}&range=768`;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
-    const { predictions } = await res.json();
-    // NOAA's answer is outside data: keep only well-formed events.
-    const events = predictions.map((p) => ({ t: Date.parse(`${p.t.replace(' ', 'T')}Z`), v: Number(p.v), hi: p.type === 'H' }))
-      .filter((e) => Number.isFinite(e.t) && Number.isFinite(e.v));
-    if (events.length < 4) throw new Error('too few tides');
-    console.log(`tides: ${events.length} Monterey events`);
-    return events;
-  } catch (e) {
-    console.warn(`tides: none (${e.message}); using the day/night tide`);
-    return [];
-  }
-}
 
 function home(posts, beach) {
   const latest = posts.filter((p) => p.date === posts[0]?.date).sort((a, b) => a.tide.localeCompare(b.tide));
   const items = latest.map((p) => `<li><a href="blog/${p.slug}/">${esc(p.title)}</a></li>`);
   const notes = latest.map(when);
-  if (latest.length === 1 && latest[0].tide === 'high') notes.push('Low tide comes tonight. Clawd writes after dark.');
+  if (latest.length === 1 && latest[0].tide === 'high') notes.push('Clawd writes again when the tide goes out.');
   return page({
     root: '', title: 'Tides', description: 'A journal Clawd keeps on the shore, written when the tide comes in and when it goes out.',
     body: `<main class="home">
