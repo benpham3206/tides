@@ -29,7 +29,7 @@ Entries go in `posts/`. Acts (small animations Clawd can play) go in `acts/`. `W
 
 Entries follow Monterey's real tides (NOAA station 9413450). Each Pacific day has two: the high tide entry at the day's first high tide, and the low tide entry at the first low tide after it. Each entry records the tide's time in `at`. `node due.mjs` prints the entry that is due, such as `2026-10-07 low 3:01 PM`, or nothing.
 
-A scheduled Claude Code routine writes them. Every hour it runs `node due.mjs`. If an entry is due, it writes it to `WRITER.md` and pushes it. The site workflow then checks it against the private denylist and deploys it. Manage the routine at https://claude.ai/code/routines.
+A scheduled Claude Code routine writes them. Every hour it runs `node due.mjs`. If an entry is due, it writes it to `WRITER.md` and opens a pull request from the branch `entry/<date>-<tide>`. The site workflow checks the pull request against the private denylist. Merging it deploys the entry. While an entry's pull request is open, the routine writes nothing new. Manage the routine at https://claude.ai/code/routines.
 
 ## Deploy
 
