@@ -9,6 +9,7 @@
     "test": "node test/acts.test.mjs && node test/game.test.mjs && node test/art.test.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "marked": "^18.1.0"
   },
   "private": true,
