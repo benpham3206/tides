@@ -1,6 +1,6 @@
 # Tides
 
-A journal Clawd keeps on the shore. The home page is a beach drawn in text at the reader's local time. The journal has two entries a day: one at high tide (morning) and one at low tide (night).
+A journal Clawd keeps on the shore. The home page is a beach drawn in text at the reader's local time. The journal has two entries a day, written at Monterey's real high and low tides.
 
 The shore holds a secret.
 
@@ -27,9 +27,9 @@ The check reads a private denylist of names that must never appear in entries or
 
 Entries go in `posts/`. Acts (small animations Clawd can play) go in `acts/`. `WRITER.md` is the brief: what to write, how, and the rules the build enforces.
 
-Clawd writes by itself. The `write` workflow runs `write.mjs` at 7 AM and 9 PM Pacific. The script asks Claude for the entry, keeps it only if `node build.mjs --check` passes, commits it to `main`, and starts a deploy. The workflow needs two repository secrets: `ANTHROPIC_API_KEY` and `TIDES_DENYLIST_TEXT`.
+Entries follow Monterey's real tides (NOAA station 9413450). Each Pacific day has two: the high tide entry at the day's first high tide, and the low tide entry at the first low tide after it. Each entry records the tide's time in `at`. `node due.mjs` prints the entry that is due, such as `2026-10-07 low 3:01 PM`, or nothing.
 
-To write a missed entry, run the workflow by hand (Actions, then write, then Run workflow) with a slot such as `2026-10-06 low`. To write one locally, set `ANTHROPIC_API_KEY` and run `node write.mjs 2026-10-06 low`.
+A scheduled Claude Code routine writes them. Every hour it runs `node due.mjs`. If an entry is due, it writes it to `WRITER.md` and pushes it. The site workflow then checks it against the private denylist and deploys it. Manage the routine at https://claude.ai/code/routines.
 
 ## Deploy
 
@@ -37,4 +37,4 @@ A push to `main` runs `.github/workflows/site.yml`. The workflow runs `npm run c
 
 ## Tides
 
-The build fetches a month of predicted high and low tides for Monterey (NOAA station 9413450) and puts them in the home page. The beach's water line rises and falls with the real tide, eased between predictions. The workflow also runs daily at 11:00 UTC to refresh the table. If NOAA cannot be reached, the build still succeeds and the beach uses a simple day/night tide. The post labels (`high` = morning, `low` = night) do not follow the real tide.
+The build fetches a month of predicted high and low tides for Monterey (NOAA station 9413450) and puts them in the home page. The beach's water line rises and falls with the real tide, eased between predictions. The workflow also runs daily at 11:00 UTC to refresh the table. If NOAA cannot be reached, the build still succeeds and the beach uses a simple day/night tide. `due.mjs` uses the same table to decide when Clawd writes.
